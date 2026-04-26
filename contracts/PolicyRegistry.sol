@@ -293,4 +293,38 @@ contract PolicyRegistry is Ownable2Step, ReentrancyGuard {
     function _toEthSignedMessageHash(bytes32 digest) internal pure returns (bytes32 prefixedDigest) {
         prefixedDigest = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", digest));
     }
-}
+
+    /**
+     * @notice Retrieves a policy snapshot by id.
+     * @param policyId Unique policy identifier.
+     * @return policy The stored policy record.
+     */
+    function getPolicy(bytes32 policyId) external view returns (Policy memory policy) {
+        return policies[policyId];
+    }
+
+    /**
+     * @notice Checks if a policy is currently active.
+     * @param policyId Policy identifier.
+     * @return True if policy exists and is active.
+     */
+    function isPolicyActive(bytes32 policyId) external view returns (bool) {
+        return policies[policyId].active;
+    }
+
+    /**
+     * @notice Returns all three guardian addresses.
+     * @return Array of three guardian addresses.
+     */
+    function getGuardians() external view returns (address[3] memory) {
+        return guardians;
+    }
+
+    /**
+     * @notice Checks if a nonce has been consumed.
+     * @param nonce Nonce value to check.
+     * @return True if nonce has been used.
+     */
+    function hasNonceBeenUsed(uint64 nonce) external view returns (bool) {
+        return usedNonces[nonce];
+    }

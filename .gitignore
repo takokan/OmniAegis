@@ -98,5 +98,34 @@ coverage/
 # =========================
 
 *.log
+
+# =========================
+
+# Hardhat & Blockchain
+
+# =========================
+
+/cache
+/artifacts
+typechain-types/
+gas-report.txt
+coverage/
+
+# Frontend build
+/frontend/dist
+
+# Backend Qdrant
+/decision_layer/.qdrant
+
+# Docker overrides
+docker-compose.override.yml
+
+# Deployment artifacts (.json files are tracked)
+# deployments/ is tracked for contract addresses
+
+# IDE caches
+.nyc_output/
+.pytest_cache/
+
 tmp/
 temp/

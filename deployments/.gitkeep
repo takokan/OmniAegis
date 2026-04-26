@@ -1,0 +1,17 @@
+# Deployment artifacts will be stored here
+# This directory contains:
+# - Compiled contract ABIs
+# - Deployment addresses
+# - Network configurations
+# 
+# Example structure:
+# deployments/
+#   ├── latest.json                 # Latest deployment
+#   ├── mainnet-1234567890.json    # Mainnet deployment
+#   ├── mumbai-1234567890.json     # Mumbai testnet deployment
+#   ├── MerkleAnchor.json          # Contract ABI
+#   ├── PolicyRegistry.json        # Contract ABI
+#   └── SentinelAudit.json         # Contract ABI
+
+# Add deployments to git (track addresses)
+*.json

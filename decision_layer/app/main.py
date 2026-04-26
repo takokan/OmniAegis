@@ -12,6 +12,7 @@ from typing import Any
 
 from fastapi import APIRouter, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import Response
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import QdrantClientSingleton, load_qdrant_settings
 from app.batch_api import router as batch_router
@@ -189,6 +190,20 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+# Configure CORS for frontend access
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173").split(",")
+cors_origins = [origin.strip() for origin in cors_origins if origin.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
 app.add_middleware(PrometheusMiddleware, metrics=GLOBAL_METRICS)
 app.include_router(batch_router)
 app.include_router(hitl_router)

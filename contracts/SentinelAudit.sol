@@ -166,4 +166,74 @@ contract SentinelAudit is Ownable2Step, ReentrancyGuard {
     function getDecision(bytes32 decisionId) external view returns (DecisionRecord memory record) {
         record = _decisionById[decisionId];
     }
+
+    /**
+     * @notice Checks if a decision has been recorded.
+     * @param decisionId The decision identifier to check.
+     * @return True if the decision exists.
+     */
+    function hasDecision(bytes32 decisionId) external view returns (bool) {
+        return decisionExists[decisionId];
+    }
+
+    /**
+     * @notice Batch records multiple high-stakes decisions in a single transaction.
+     * @dev More gas-efficient than multiple individual recordDecision calls.
+     * @param decisions Array of decision parameters (id, policyId, riskScore, action, highStakes, evidenceCid).
+     */
+    function recordDecisionBatch(
+        bytes32[] calldata decisions,
+        uint64[] calldata policyIds,
+        uint32[] calldata riskScores,
+        uint8[] calldata actions,
+        bool[] calldata highStakesFlags,
+        string[] calldata evidenceCids
+    ) external onlyAuthorisedGateway nonReentrant {
+        uint256 len = decisions.length;
+        if (
+            len == 0 ||
+            len != policyIds.length ||
+            len != riskScores.length ||
+            len != actions.length ||
+            len != highStakesFlags.length ||
+            len != evidenceCids.length
+        ) revert InvalidDecisionId();
+
+        for (uint256 i = 0; i < len; ) {
+            bytes32 decisionId = decisions[i];
+            if (decisionId == bytes32(0)) revert InvalidDecisionId();
+            if (bytes(evidenceCids[i]).length == 0) revert EmptyEvidenceCid();
+            if (decisionExists[decisionId]) revert DecisionAlreadyRecorded(decisionId);
+
+            bytes32 cidHash = keccak256(bytes(evidenceCids[i]));
+            uint64 ts = uint64(block.timestamp);
+
+            _decisionById[decisionId] = DecisionRecord({
+                evidenceCidHash: cidHash,
+                gateway: msg.sender,
+                timestamp: ts,
+                policyId: policyIds[i],
+                riskScoreBps: riskScores[i],
+                action: actions[i],
+                highStakes: highStakesFlags[i]
+            });
+            decisionExists[decisionId] = true;
+
+            emit DecisionRecorded(
+                decisionId,
+                msg.sender,
+                policyIds[i],
+                riskScores[i],
+                actions[i],
+                highStakesFlags[i],
+                cidHash,
+                evidenceCids[i],
+                ts
+            );
+
+            unchecked {
+                ++i;
+            }
+        }
+    }
 }

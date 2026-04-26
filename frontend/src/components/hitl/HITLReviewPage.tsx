@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useHITLReview } from '@/context/HITLReviewContext';
 import { useHITLWebSocket } from '@/hooks/useHITLWebSocket';
+import { apiClient } from '@/services/api';
 import { AssetViewer } from './AssetViewer';
 import { ContextGrid } from './ContextGrid';
 import { DecisionPanel } from './DecisionPanel';
@@ -45,13 +46,9 @@ export function HITLReviewPage({ itemId, onDecisionSubmit }: HITLReviewPageProps
 
     const fetchItem = async () => {
       try {
-        const response = await fetch(`/api/hitl/items/${itemId}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch HITL item: ${response.statusText}`);
-        }
-        const item = await response.json();
-        setCurrentItem(item);
-        const expiresAt = Date.now() + item.lock_ttl_seconds * 1000;
+        const item = await apiClient.getHITLItem(itemId);
+        setCurrentItem(item as any);
+        const expiresAt = Date.now() + (item as any).lock_ttl_seconds * 1000;
         setLockExpiry(expiresAt);
       } catch (error) {
         setError(error instanceof Error ? error.message : 'Failed to load item');

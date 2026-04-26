@@ -206,4 +206,31 @@ contract MerkleAnchor is Ownable2Step, ReentrancyGuard {
 
         valid = MerkleProof.verifyCalldata(proof, anchor.merkleRoot, leafHash);
     }
+
+    /**
+     * @notice Retrieves batch anchor metadata by batch id.
+     * @param batchId Batch identifier.
+     * @return Batch metadata structure.
+     */
+    function getBatch(uint64 batchId) external view returns (BatchAnchor memory) {
+        if (batches[batchId].merkleRoot == bytes32(0)) revert BatchNotFound(batchId);
+        return batches[batchId];
+    }
+
+    /**
+     * @notice Returns the next batch id that will be allocated.
+     * @return The monotonic next batch identifier.
+     */
+    function getNextBatchId() external view returns (uint64) {
+        return nextBatchId;
+    }
+
+    /**
+     * @notice Checks if a Merkle root has been previously anchored.
+     * @param merkleRoot The root to check.
+     * @return True if the root is anchored.
+     */
+    function isRootAnchored(bytes32 merkleRoot) external view returns (bool) {
+        return rootAnchored[merkleRoot];
+    }
 }
