@@ -1,0 +1,18 @@
+{
+  "name": "omniaegis-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "description": "OmniAegis workspace scripts",
+  "scripts": {
+    "dev": "bash scripts/dev.sh",
+    "build": "npm --prefix frontend/OmniAegis-Frontend-main run build",
+    "start": "npm --prefix frontend/OmniAegis-Frontend-main run start",
+    "lint": "npm --prefix frontend/OmniAegis-Frontend-main run lint",
+    "backend:dev": "cd decision_layer && /home/ayush02/Desktop/OmniAegis/.venv/bin/python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "backend:install": "cd decision_layer && pip3 install -r requirements.txt",
+    "setup": "npm install --prefix frontend/OmniAegis-Frontend-main && npm run backend:install"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}
