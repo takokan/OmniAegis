@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Threat {
+  id          String   @id @default(cuid())
+  type        String
+  riskLevel   String
+  status      String
+  sourceURL   String
+  discoveredAt DateTime
+}
+
+model Metric {
+  id                   String @id @default(cuid())
+  totalAssets          Int
+  activeThreats        Int
+  protectionEfficiency Int
+}

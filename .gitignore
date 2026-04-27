@@ -1,0 +1,134 @@
+# =========================
+
+# Node / Frontend
+
+# =========================
+*.json
+
+node_modules/
+node_modules/.bin
+dist/
+build/
+.vite/
+.cache/
+
+# Logs
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+
+.env
+.env.*
+!.env.example
+
+# =========================
+
+# Python
+
+# =========================
+
+**pycache**/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+
+venv/
+.env/
+.envrc/
+.venv/
+env/
+
+# Python packaging
+
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter Notebook
+
+.ipynb_checkpoints/
+
+# =========================
+
+# OS / System files
+
+# =========================
+
+.DS_Store
+Thumbs.db
+
+# =========================
+
+# Editor / IDE
+
+# =========================
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+
+# TypeScript / Misc
+
+# =========================
+
+*.tsbuildinfo
+
+# =========================
+
+# Testing / Coverage
+
+# =========================
+
+coverage/
+*.lcov
+
+# =========================
+
+# Temporary files
+
+# =========================
+
+*.log
+
+# =========================
+
+# Hardhat & Blockchain
+
+# =========================
+
+/cache
+/artifacts
+typechain-types/
+gas-report.txt
+coverage/
+
+# Frontend build
+/frontend/dist
+
+# Backend Qdrant
+/decision_layer/.qdrant
+
+# Docker overrides
+docker-compose.override.yml
+
+# Deployment artifacts (.json files are tracked)
+# deployments/ is tracked for contract addresses
+
+# IDE caches
+.nyc_output/
+.pytest_cache/
+
+tmp/
+temp/
+.qdrant
+Md files

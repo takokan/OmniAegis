@@ -1,0 +1,8 @@
+# Minimal requirements for testing OmniAegis API infrastructure
+# Skips heavy ML dependencies for quick local testing
+fastapi>=0.115.0
+pydantic-settings>=2.6.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
+httpx>=0.27.0
+web3>=7.0.0
