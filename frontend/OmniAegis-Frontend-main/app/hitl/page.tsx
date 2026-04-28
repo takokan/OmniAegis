@@ -64,177 +64,71 @@ interface TaskBoard {
   rejected: HITLTask[];
 }
 
-const INITIAL_TASKS: TaskBoard = {
-  pending: [
-    {
-      id: 'HITL-2024-0501',
-      assetId: 'img_a7x2q9p1',
-      assetType: 'image',
-      description: 'Borderline confidence (0.52) on policy decision',
-      confidence: 0.52,
-      policy: 'ContentV3',
-      priority: 'high',
-      createdAt: '2024-04-28 13:22:05',
-      estimatedReview: '5 min',
-    },
-    {
-      id: 'HITL-2024-0500',
-      assetId: 'vid_b8y3r0q2',
-      assetType: 'video',
-      description: 'Complex scene with multiple violations',
-      confidence: 0.38,
-      policy: 'ContentV3',
-      priority: 'high',
-      createdAt: '2024-04-28 12:45:33',
-      estimatedReview: '8 min',
-    },
-    {
-      id: 'HITL-2024-0499',
-      assetId: 'aud_c9z4s1r3',
-      assetType: 'audio',
-      description: 'Ambiguous speech pattern',
-      confidence: 0.45,
-      policy: 'AudioV1',
-      priority: 'medium',
-      createdAt: '2024-04-28 11:18:14',
-      estimatedReview: '3 min',
-    },
-    {
-      id: 'HITL-2024-0498',
-      assetId: 'txt_d0a5t2s4',
-      assetType: 'text',
-      description: 'Contextual nuance missed by model',
-      confidence: 0.41,
-      policy: 'NLPv2',
-      priority: 'medium',
-      createdAt: '2024-04-28 10:52:47',
-      estimatedReview: '4 min',
-    },
-    {
-      id: 'HITL-2024-0497',
-      assetId: 'img_e1b6u3t5',
-      assetType: 'image',
-      description: 'Edge case in background analysis',
-      confidence: 0.48,
-      policy: 'ContentV3',
-      priority: 'low',
-      createdAt: '2024-04-28 09:30:22',
-      estimatedReview: '6 min',
-    },
-    {
-      id: 'HITL-2024-0496',
-      assetId: 'vid_f2c7v4u6',
-      assetType: 'video',
-      description: 'Frame-by-frame review recommended',
-      confidence: 0.35,
-      policy: 'ContentV3',
-      priority: 'high',
-      createdAt: '2024-04-28 08:15:11',
-      estimatedReview: '12 min',
-    },
-    {
-      id: 'HITL-2024-0495',
-      assetId: 'aud_g3d8w5v7',
-      assetType: 'audio',
-      description: 'Background noise affecting detection',
-      confidence: 0.44,
-      policy: 'AudioV1',
-      priority: 'low',
-      createdAt: '2024-04-28 07:41:56',
-      estimatedReview: '5 min',
-    },
-    {
-      id: 'HITL-2024-0494',
-      assetId: 'txt_h4e9x6w8',
-      assetType: 'text',
-      description: 'Sarcasm detection boundary',
-      confidence: 0.43,
-      policy: 'NLPv2',
-      priority: 'medium',
-      createdAt: '2024-04-28 06:20:14',
-      estimatedReview: '4 min',
-    },
-    {
-      id: 'HITL-2024-0493',
-      assetId: 'img_i5f0y7x9',
-      assetType: 'image',
-      description: 'Low resolution artifact',
-      confidence: 0.39,
-      policy: 'ContentV3',
-      priority: 'low',
-      createdAt: '2024-04-28 05:08:42',
-      estimatedReview: '3 min',
-    },
-    {
-      id: 'HITL-2024-0492',
-      assetId: 'vid_j6g1z8y0',
-      assetType: 'video',
-      description: 'Rapid scene transitions',
-      confidence: 0.47,
-      policy: 'ContentV3',
-      priority: 'medium',
-      createdAt: '2024-04-28 04:33:19',
-      estimatedReview: '7 min',
-    },
-  ],
-  reviewing: [
-    {
-      id: 'HITL-2024-0491',
-      assetId: 'img_k7h2a1z1',
-      assetType: 'image',
-      description: 'Model vs. human disagreement',
-      confidence: 0.36,
-      policy: 'ContentV3',
-      priority: 'high',
-      createdAt: '2024-04-28 03:15:06',
-      estimatedReview: '5 min',
-    },
-    {
-      id: 'HITL-2024-0490',
-      assetId: 'aud_l8i3b2a2',
-      assetType: 'audio',
-      description: 'Emotion vs. intention mismatch',
-      confidence: 0.40,
-      policy: 'AudioV1',
-      priority: 'medium',
-      createdAt: '2024-04-28 02:47:53',
-      estimatedReview: '3 min',
-    },
-  ],
-  approved: [
-    {
-      id: 'HITL-2024-0489',
-      assetId: 'img_m9j4c3b3',
-      assetType: 'image',
-      description: 'Model decision confirmed',
-      confidence: 0.89,
-      policy: 'ContentV3',
-      priority: 'low',
-      createdAt: '2024-04-27 23:22:11',
-      estimatedReview: '2 min',
-    },
-  ],
-  rejected: [
-    {
-      id: 'HITL-2024-0488',
-      assetId: 'txt_n0k5d4c4',
-      assetType: 'text',
-      description: 'False positive overruled',
-      confidence: 0.18,
-      policy: 'NLPv2',
-      priority: 'low',
-      createdAt: '2024-04-27 22:51:45',
-      estimatedReview: '3 min',
-    },
-  ],
+const EMPTY_TASKS: TaskBoard = { pending: [], reviewing: [], approved: [], rejected: [] };
+
+type ApiQueueItem = {
+  id?: string;
+  asset_id?: string;
+  url?: string;
+  verdict?: string;
+  confidence?: number;
+  queued_at?: string;
+  status?: string;
+  reason?: string;
+  priority_score?: number;
 };
 
 export default function HITLBoardPage() {
-  const [taskBoard, setTaskBoard] = useState<TaskBoard>(INITIAL_TASKS);
+  const [taskBoard, setTaskBoard] = useState<TaskBoard>(EMPTY_TASKS);
   const [selectedTask, setSelectedTask] = useState<HITLTask | null>(null);
   const [selectedColumn, setSelectedColumn] = useState<keyof TaskBoard>('pending');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/hitl/queue', { cache: 'no-store' });
+        const data = (await res.json()) as { items?: ApiQueueItem[] };
+        const items = Array.isArray(data.items) ? data.items : [];
+        const mapped: HITLTask[] = items.map((it, idx) => {
+          const verdict = (it.verdict || 'inconclusive').toLowerCase();
+          const conf = typeof it.confidence === 'number' ? it.confidence : 0;
+          const priority: HITLTask['priority'] =
+            verdict === 'match' || conf >= 0.85 ? 'high' : conf >= 0.6 ? 'medium' : 'low';
+
+          return {
+            id: (it.id || it.asset_id || `HITL-${idx}`).toString(),
+            assetId: (it.asset_id || 'unknown').toString(),
+            assetType: 'video',
+            description: `${it.reason || 'REVIEW_REQUIRED'} · ${verdict}${it.url ? ` · ${it.url}` : ''}`,
+            confidence: conf,
+            policy: 'AnalysisEngine',
+            priority,
+            createdAt: (it.queued_at || new Date().toISOString()).toString(),
+            estimatedReview: verdict === 'match' ? '2 min' : '5 min',
+          };
+        });
+
+        if (!cancelled) {
+          setTaskBoard({ ...EMPTY_TASKS, pending: mapped });
+        }
+      } catch {
+        if (!cancelled) setTaskBoard(EMPTY_TASKS);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    const interval = window.setInterval(load, 3000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, []);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -577,6 +471,9 @@ export default function HITLBoardPage() {
             <h1 className="text-4xl font-bold text-text-primary">HITL Board</h1>
             <p className="text-lg text-text-secondary mt-1">
               Review tasks flagged for human-in-the-loop approval
+            </p>
+            <p className="text-sm text-text-tertiary mt-2">
+              {loading ? 'Syncing queue…' : 'Live queue from Decision Stream'}
             </p>
           </div>
 

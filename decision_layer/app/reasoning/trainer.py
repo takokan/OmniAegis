@@ -6,7 +6,11 @@ from typing import Iterable
 import torch
 import torch.nn.functional as F
 from torch import nn
-from torch_geometric.data import HeteroData
+
+try:  # optional dependency in some runtimes
+    from torch_geometric.data import HeteroData
+except Exception:  # pragma: no cover
+    HeteroData = Iterable  # type: ignore[misc,assignment]
 
 
 @dataclass

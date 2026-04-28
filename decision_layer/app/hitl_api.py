@@ -6,11 +6,14 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.auth_api import AuthUser, get_current_user
+from fastapi.responses import JSONResponse
 
 try:
     from decision_layer.services.hitl_monitor import HITLQueueItem, ReviewerProfile
+    from decision_layer.shared import get_redis_client
 except ModuleNotFoundError:  # pragma: no cover
     from services.hitl_monitor import HITLQueueItem, ReviewerProfile
+    from shared import get_redis_client
 
 router = APIRouter(prefix="/hitl", tags=["hitl"])
 
@@ -161,3 +164,31 @@ async def hitl_queue_stats(
         return dict(service.queue_stats())
     except Exception as exc:  # pragma: no cover - defensive path
         raise HTTPException(status_code=500, detail=f"Failed to read HITL queue stats: {exc}") from exc
+
+
+@router.get("/queue/peek")
+async def peek_hitl_queue(limit: int = 50) -> JSONResponse:
+    """Cloud-friendly HITL queue peek.
+
+    This reads from the Upstash-backed ZSET used by stream consumers:
+    `sentinel:hitl:queue` where members are JSON payloads.
+    """
+    if limit < 1 or limit > 500:
+        raise HTTPException(status_code=400, detail="limit must be between 1 and 500")
+
+    redis_client = await get_redis_client()
+    key = "sentinel:hitl:queue"
+    items = await redis_client.zrevrange(key, 0, limit - 1, withscores=True)
+
+    parsed: list[dict[str, Any]] = []
+    for member, score in items:
+        raw = member.decode("utf-8", errors="replace") if isinstance(member, (bytes, bytearray)) else str(member)
+        try:
+            obj = json.loads(raw)
+            if isinstance(obj, dict):
+                obj["priority_score"] = float(score)
+                parsed.append(obj)
+        except Exception:
+            parsed.append({"raw": raw, "priority_score": float(score)})
+
+    return JSONResponse({"items": parsed, "total": len(parsed)})

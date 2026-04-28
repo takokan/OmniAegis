@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 interface NavItem {
   label: string;
   href: string;
-  icon: 'overview' | 'ingest' | 'monitor' | 'xai' | 'audit' | 'hitl';
+  icon: 'overview' | 'ingest' | 'monitor' | 'xai' | 'audit' | 'hitl' | 'blockchain';
   badge?: number;
   children?: NavItem[];
 }
@@ -25,6 +25,7 @@ const defaultItems: NavItem[] = [
   { label: 'XAI Viewer', href: '/xai', icon: 'xai' },
   { label: 'Audit Console', href: '/audit', icon: 'audit', badge: 0 },
   { label: 'HITL Board', href: '/hitl', icon: 'hitl', badge: 0 },
+  { label: 'Blockchain Logs', href: '/blockchain-logs', icon: 'blockchain', badge: 0 },
 ];
 
 function NavIcon({ icon, active }: { icon: NavItem['icon']; active: boolean }) {
@@ -74,6 +75,16 @@ function NavIcon({ icon, active }: { icon: NavItem['icon']; active: boolean }) {
           <circle cx="13" cy="7" r="2.5" />
           <path d="M3.5 15c.7-2 2-3 3.5-3s2.8 1 3.5 3" />
           <path d="M9.5 15c.7-2 2-3 3.5-3s2.8 1 3.5 3" />
+        </svg>
+      );
+    case 'blockchain':
+      return (
+        <svg className={className} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <rect x="3.5" y="3.5" width="5" height="5" rx="1" />
+          <rect x="11.5" y="3.5" width="5" height="5" rx="1" />
+          <rect x="3.5" y="11.5" width="5" height="5" rx="1" />
+          <rect x="11.5" y="11.5" width="5" height="5" rx="1" />
+          <path d="M8.5 6h3M6 8.5v3M14 8.5v3M8.5 14h3" />
         </svg>
       );
   }

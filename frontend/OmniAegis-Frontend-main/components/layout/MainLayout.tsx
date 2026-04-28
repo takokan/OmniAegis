@@ -48,6 +48,7 @@ export function MainLayout({
         { label: 'XAI Viewer', href: '/xai', icon: 'xai' as const },
         { label: 'Audit Console', href: '/audit', icon: 'audit' as const, badge: 3 },
         { label: 'HITL Board', href: '/hitl', icon: 'hitl' as const, badge: 12 },
+        { label: 'Blockchain Logs', href: '/blockchain-logs', icon: 'blockchain' as const, badge: 0 },
       ];
 
       return items.filter((item): item is NonNullable<(typeof items)[number]> => Boolean(item));

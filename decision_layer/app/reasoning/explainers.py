@@ -6,11 +6,23 @@ from typing import Any
 
 import cv2
 import numpy as np
-import shap
 import torch
 import torch.nn.functional as F
-from captum.attr import IntegratedGradients
-from torch_geometric.data import HeteroData
+
+try:  # optional dependency in some runtimes
+    from torch_geometric.data import HeteroData
+except Exception:  # pragma: no cover
+    HeteroData = Any  # type: ignore[misc,assignment]
+
+try:  # optional dependency in some runtimes
+    import shap
+except Exception:  # pragma: no cover
+    shap = None  # type: ignore[assignment]
+
+try:  # optional dependency in some runtimes
+    from captum.attr import IntegratedGradients
+except Exception:  # pragma: no cover
+    IntegratedGradients = None  # type: ignore[assignment]
 
 
 @dataclass
@@ -26,6 +38,10 @@ class VisualExplainer:
     """Captum Integrated Gradients explainer for Stage-2 visual embedding."""
 
     def __init__(self, semantic_embedder: Any) -> None:
+        if IntegratedGradients is None:
+            raise RuntimeError(
+                "Captum is unavailable in this runtime. Install `captum` in the same environment as the backend process."
+            )
         self.device = torch.device("cpu")
         self.feature_extractor = semantic_embedder.feature_extractor
         self.projection = semantic_embedder.projection
@@ -118,6 +134,10 @@ class GraphExplainer:
     ]
 
     def __init__(self, rights_model: torch.nn.Module, max_feature_sample: int = 6) -> None:
+        if shap is None:
+            raise RuntimeError(
+                "SHAP is unavailable in this runtime. Install `shap` in the same environment as the backend process."
+            )
         self.model = rights_model
         self.model.eval()
         self.device = torch.device("cpu")

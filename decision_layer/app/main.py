@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from importlib import import_module
 from pathlib import Path
 from typing import Any
+import json
 
 from fastapi import APIRouter, Depends, FastAPI, File, Form, Header, HTTPException, UploadFile
 from fastapi.responses import Response
@@ -65,6 +66,8 @@ try:
     from decision_layer.services.monitoring import MetricsRegistry, PrometheusMiddleware, metrics_response
     from decision_layer.services.xai_storage import ExplainabilityStorage
     from decision_layer.services.xai_umap import UMAPProjector
+    from decision_layer.services.decision_stream_consumer.main import run_decision_stream_consumer
+    from decision_layer.services.search_orchestrator.main import run_search_orchestrator
     from decision_layer.shared import (
         check_connections,
         close_db_clients,
@@ -80,6 +83,8 @@ except ModuleNotFoundError:  # pragma: no cover
     from services.monitoring import MetricsRegistry, PrometheusMiddleware, metrics_response
     from services.xai_storage import ExplainabilityStorage
     from services.xai_umap import UMAPProjector
+    from services.decision_stream_consumer.main import run_decision_stream_consumer
+    from services.search_orchestrator.main import run_search_orchestrator
     from shared import check_connections, close_db_clients, get_neo4j_driver, get_postgres_pool, get_redis_client
 
 
@@ -193,6 +198,22 @@ async def lifespan(app: FastAPI):
     app.state.hitl_stop_event = hitl_stop_event
     app.state.hitl_maintenance_task = hitl_maintenance_task
 
+    decision_consumer_task: asyncio.Task[None] | None = None
+    if _is_truthy(os.getenv("ENABLE_DECISION_STREAM_CONSUMER", "1")):
+        try:
+            decision_consumer_task = asyncio.create_task(run_decision_stream_consumer(), name="sentinel-decision-consumer")
+            app.state.decision_consumer_task = decision_consumer_task
+        except Exception as exc:
+            logger.warning("Decision stream consumer failed to start: %s", exc)
+
+    search_orchestrator_task: asyncio.Task[None] | None = None
+    if _is_truthy(os.getenv("ENABLE_SEARCH_ORCHESTRATOR", "1")):
+        try:
+            search_orchestrator_task = asyncio.create_task(run_search_orchestrator(), name="sentinel-search-orchestrator")
+            app.state.search_orchestrator_task = search_orchestrator_task
+        except Exception as exc:
+            logger.warning("Search orchestrator failed to start: %s", exc)
+
     batch_signer = _build_batch_signer()
     batch_coordinator = None
     try:
@@ -249,6 +270,22 @@ async def lifespan(app: FastAPI):
     try:
         yield
     finally:
+        decision_task = getattr(app.state, "decision_consumer_task", None)
+        if decision_task is not None:
+            decision_task.cancel()
+            try:
+                await decision_task
+            except asyncio.CancelledError:
+                pass
+
+        search_task = getattr(app.state, "search_orchestrator_task", None)
+        if search_task is not None:
+            search_task.cancel()
+            try:
+                await search_task
+            except asyncio.CancelledError:
+                pass
+
         if getattr(app.state, "batch_coordinator", None) is not None:
             await app.state.batch_coordinator.stop()
 
@@ -668,15 +705,22 @@ async def register_onboarding_content(
                 except Exception as exc:
                     logger.warning("Graph builder skipped for onboarding image asset %s: %s", assigned_id, exc)
             elif app.state.graph_db is not None:
-                app.state.graph_db.upsert_asset_context(
-                    asset_id=assigned_id,
-                    metadata={
-                        **base_metadata,
-                        "decision_label": "REGISTERED",
-                        "decision_confidence": 1.0,
-                    },
-                    neighbors=_sanitize_match_neighbors(semantic_matches),
-                )
+                try:
+                    app.state.graph_db.upsert_asset_context(
+                        asset_id=assigned_id,
+                        metadata={
+                            **base_metadata,
+                            "decision_label": "REGISTERED",
+                            "decision_confidence": 1.0,
+                        },
+                        neighbors=_sanitize_match_neighbors(semantic_matches),
+                    )
+                except Exception as exc:
+                    logger.warning(
+                        "Graph upsert skipped for onboarding image asset %s: %s",
+                        assigned_id,
+                        exc,
+                    )
 
             response_payload["matches"] = [
                 {
@@ -708,11 +752,18 @@ async def register_onboarding_content(
                 "fingerprint_id": fp["fingerprint_id"],
             }
             if app.state.graph_db is not None:
-                app.state.graph_db.upsert_asset_context(
-                    asset_id=assigned_id,
-                    metadata={**base_metadata, "decision_label": "REGISTERED", "decision_confidence": 1.0},
-                    neighbors=_sanitize_match_neighbors(audio_matches),
-                )
+                try:
+                    app.state.graph_db.upsert_asset_context(
+                        asset_id=assigned_id,
+                        metadata={**base_metadata, "decision_label": "REGISTERED", "decision_confidence": 1.0},
+                        neighbors=_sanitize_match_neighbors(audio_matches),
+                    )
+                except Exception as exc:
+                    logger.warning(
+                        "Graph upsert skipped for onboarding audio asset %s: %s",
+                        assigned_id,
+                        exc,
+                    )
             response_payload["matches"] = [
                 {
                     "asset_id": match.asset_id,
@@ -747,11 +798,18 @@ async def register_onboarding_content(
                 "aggregate_hash_hex": fp["aggregate_hash_hex"],
             }
             if app.state.graph_db is not None:
-                app.state.graph_db.upsert_asset_context(
-                    asset_id=assigned_id,
-                    metadata={**base_metadata, "decision_label": "REGISTERED", "decision_confidence": 1.0},
-                    neighbors=_sanitize_match_neighbors(video_matches),
-                )
+                try:
+                    app.state.graph_db.upsert_asset_context(
+                        asset_id=assigned_id,
+                        metadata={**base_metadata, "decision_label": "REGISTERED", "decision_confidence": 1.0},
+                        neighbors=_sanitize_match_neighbors(video_matches),
+                    )
+                except Exception as exc:
+                    logger.warning(
+                        "Graph upsert skipped for onboarding video asset %s: %s",
+                        assigned_id,
+                        exc,
+                    )
             response_payload["matches"] = [
                 {
                     "asset_id": match.asset_id,
@@ -764,7 +822,64 @@ async def register_onboarding_content(
             ]
 
         if app.state.graph_db is not None:
-            response_payload["graph"] = app.state.graph_db.fetch_asset_relationship_graph(assigned_id)
+            try:
+                response_payload["graph"] = app.state.graph_db.fetch_asset_relationship_graph(assigned_id)
+            except Exception as exc:
+                logger.warning(
+                    "Graph fetch skipped for onboarding asset %s: %s",
+                    assigned_id,
+                    exc,
+                )
+
+        # Autonomously trigger discovery once the SoT asset is registered.
+        try:
+            redis_client = await get_redis_client()
+            protected_terms: list[str] = []
+            protected_terms.append(resolved_title)
+            protected_terms.append(str(file.filename or ""))
+            protected_terms.append(str(resolved_creator_id))
+            protected_terms.append(str(resolved_licensee_id))
+
+            for m in response_payload.get("matches", []) or []:
+                if not isinstance(m, dict):
+                    continue
+                meta = m.get("metadata") if isinstance(m.get("metadata"), dict) else {}
+                if isinstance(meta, dict):
+                    for k in ("title", "filename", "canonical_url", "source_url"):
+                        v = meta.get(k)
+                        if isinstance(v, str) and v.strip():
+                            protected_terms.append(v.strip())
+
+            # Keep terms short & safe to search on
+            cleaned: list[str] = []
+            for t in protected_terms:
+                value = " ".join(str(t or "").split()).strip()
+                if len(value) >= 3:
+                    cleaned.append(value)
+            # stable unique
+            unique: list[str] = []
+            seen: set[str] = set()
+            for t in cleaned:
+                low = t.lower()
+                if low not in seen:
+                    seen.add(low)
+                    unique.append(low)
+
+            await redis_client.xadd(
+                os.getenv("SENTINEL_SEARCH_JOB_STREAM_KEY", "sentinel:search:jobs"),
+                {
+                    "asset_id": assigned_id,
+                    "user_id": owner_user_id,
+                    "modality": modality.value,
+                    "title": resolved_title,
+                    "protected_terms": json.dumps(unique[:50], ensure_ascii=False),
+                    "registered_at": uploaded_at,
+                },
+            )
+            response_payload["discovery_job_enqueued"] = True
+        except Exception as exc:
+            logger.warning("Failed to enqueue discovery job for asset_id=%s: %s", assigned_id, exc)
+            response_payload["discovery_job_enqueued"] = False
 
         return response_payload
     except ValueError as exc:

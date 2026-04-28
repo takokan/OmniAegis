@@ -5,7 +5,11 @@ from importlib import import_module
 from typing import Any
 
 import torch
-from torch_geometric.data import HeteroData
+
+try:  # optional dependency in some runtimes
+    from torch_geometric.data import HeteroData
+except Exception:  # pragma: no cover
+    HeteroData = Any  # type: ignore[misc,assignment]
 
 
 @dataclass

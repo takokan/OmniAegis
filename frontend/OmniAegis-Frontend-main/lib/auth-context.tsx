@@ -45,6 +45,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const SESSION_STORAGE_KEY = 'sentinel-user';
 const SESSION_TOKEN_STORAGE_KEY = 'sentinel-access-token';
+export const LAST_LOGIN_EVENT_KEY = 'sentinel-last-login-event';
 const AUTH_API_BASE_URL = '/api/auth';
 const DEMO_TOKEN_PREFIX = 'demo-';
 
@@ -196,6 +197,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setAccessToken(session.accessToken);
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session.user));
     localStorage.setItem(SESSION_TOKEN_STORAGE_KEY, session.accessToken);
+    localStorage.setItem(LAST_LOGIN_EVENT_KEY, `${Date.now()}`);
   };
 
   const clearSession = () => {

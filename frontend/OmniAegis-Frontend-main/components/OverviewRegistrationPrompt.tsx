@@ -4,31 +4,37 @@ import { useEffect, useState } from 'react';
 
 import ContentRegistrationModal from '@/components/ContentRegistrationModal';
 import { Button } from '@/components/ui';
-import { useAuth } from '@/lib/auth-context';
+import { LAST_LOGIN_EVENT_KEY, useAuth } from '@/lib/auth-context';
 
-const SESSION_KEY_PREFIX = 'sentinel-overview-onboarding-shown';
 const LAST_ASSET_KEY = 'sentinel-last-registered-asset-id';
 const LAST_GRAPH_KEY = 'sentinel-last-registered-graph';
+const ONBOARDING_SHOWN_PREFIX = 'sentinel-overview-onboarding-shown';
 
 export default function OverviewRegistrationPrompt() {
   const { user, loading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const isEligibleRole = user?.role === 'reviewer';
 
   useEffect(() => {
-    if (loading || !user) {
+    if (loading || !user || !isEligibleRole) {
       return;
     }
 
-    const sessionKey = `${SESSION_KEY_PREFIX}:${user.id}`;
-    if (sessionStorage.getItem(sessionKey) === 'true') {
+    const loginEvent = localStorage.getItem(LAST_LOGIN_EVENT_KEY) || '';
+    if (!loginEvent) {
       return;
     }
 
-    sessionStorage.setItem(sessionKey, 'true');
+    const shownKey = `${ONBOARDING_SHOWN_PREFIX}:${user.id}:${loginEvent}`;
+    if (sessionStorage.getItem(shownKey) === 'true') {
+      return;
+    }
+
+    sessionStorage.setItem(shownKey, 'true');
     setIsOpen(true);
-  }, [loading, user]);
+  }, [isEligibleRole, loading, user]);
 
-  if (!user) {
+  if (!user || !isEligibleRole) {
     return null;
   }
 

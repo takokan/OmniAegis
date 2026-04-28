@@ -47,6 +47,7 @@ export function TopNav({
     { label: 'XAI Viewer', href: '/xai' },
     { label: 'Audit Console', href: '/audit' },
     { label: 'HITL Board', href: '/hitl' },
+    { label: 'Blockchain Logs', href: '/blockchain-logs' },
   ].filter((item) => item.label.toLowerCase().includes(quickSearch.toLowerCase()));
 
   useEffect(() => {

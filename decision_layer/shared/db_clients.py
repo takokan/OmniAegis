@@ -10,6 +10,91 @@ from redis.asyncio import Redis
 
 from .config import get_settings
 
+try:  # optional: Upstash REST redis (cloud)
+    from upstash_redis.asyncio import Redis as UpstashRedis
+except Exception:  # pragma: no cover
+    UpstashRedis = None  # type: ignore[assignment]
+
+
+class _UpstashRedisAdapter:
+    """Compatibility layer to mimic the subset of redis-py API used by this repo.
+
+    Upstash REST SDK exposes a generic `execute(...)` interface. Many parts of this
+    codebase expect `redis.asyncio.Redis`-style convenience methods.
+    """
+
+    def __init__(self, client: Any) -> None:
+        self._client = client
+
+    async def execute(self, *args: Any) -> Any:
+        # upstash_redis.asyncio.Redis.execute expects a single command list.
+        # Accept varargs here so callers can keep redis-py-like usage.
+        if len(args) == 1 and isinstance(args[0], list):
+            command = args[0]
+        else:
+            command = list(args)
+        return await self._client.execute(command)
+
+    async def ping(self) -> bool:
+        resp = await self.execute("PING")
+        return resp in (True, "PONG", b"PONG")
+
+    async def xgroup_create(self, *, name: str, groupname: str, id: str, mkstream: bool = False) -> Any:
+        cmd: list[Any] = ["XGROUP", "CREATE", name, groupname, id]
+        if mkstream:
+            cmd.append("MKSTREAM")
+        return await self.execute(*cmd)
+
+    async def xreadgroup(
+        self,
+        *,
+        groupname: str,
+        consumername: str,
+        streams: dict[str, str],
+        count: int | None = None,
+        block: int | None = None,
+    ) -> Any:
+        if len(streams) != 1:
+            raise ValueError("Upstash adapter supports a single stream per call")
+        (stream_key, stream_id), = streams.items()
+        cmd: list[Any] = ["XREADGROUP", "GROUP", groupname, consumername]
+        if count is not None:
+            cmd.extend(["COUNT", int(count)])
+        if block is not None:
+            cmd.extend(["BLOCK", int(block)])
+        cmd.extend(["STREAMS", stream_key, stream_id])
+        return await self.execute(*cmd)
+
+    async def xack(self, stream: str, group: str, message_id: str) -> Any:
+        return await self.execute("XACK", stream, group, message_id)
+
+    async def xadd(self, stream: str, fields: dict[str, Any], id: str = "*") -> Any:
+        # Flatten mapping into varargs
+        args: list[Any] = []
+        for k, v in fields.items():
+            args.extend([k, v])
+        return await self.execute("XADD", stream, id, *args)
+
+    async def zadd(self, key: str, mapping: dict[str, float]) -> Any:
+        args: list[Any] = []
+        for member, score in mapping.items():
+            args.extend([float(score), member])
+        return await self.execute("ZADD", key, *args)
+
+    async def zrevrange(self, key: str, start: int, stop: int, withscores: bool = False) -> Any:
+        cmd: list[Any] = ["ZREVRANGE", key, int(start), int(stop)]
+        if withscores:
+            cmd.append("WITHSCORES")
+        resp = await self.execute(*cmd)
+        if not withscores:
+            return resp
+        # Normalize to list[(member, score)] as redis-py does.
+        out: list[tuple[Any, float]] = []
+        if isinstance(resp, list):
+            for i in range(0, len(resp) - 1, 2):
+                out.append((resp[i], float(resp[i + 1])))
+        return out
+
 
 _redis_client: Redis | None = None
 _postgres_pool: asyncpg.Pool | None = None
@@ -30,14 +115,25 @@ async def get_redis_client() -> Redis:
 
     async with _clients_lock:
         if _redis_client is None:
-            _redis_client = Redis.from_url(
-                str(_settings().redis_url),
-                decode_responses=True,
-                health_check_interval=30,
-                socket_connect_timeout=5,
-                socket_timeout=5,
-                retry_on_timeout=True,
-            )
+            settings = _settings()
+            import os
+
+            # Prefer Upstash REST credentials when present (cloud-first).
+            upstash_url = (os.getenv("UPSTASH_REDIS_REST_URL") or "").strip()
+            upstash_token = (os.getenv("UPSTASH_REDIS_REST_TOKEN") or "").strip()
+
+            if UpstashRedis is not None and upstash_url and upstash_token:
+                client = UpstashRedis(url=upstash_url, token=upstash_token)
+                _redis_client = _UpstashRedisAdapter(client)  # type: ignore[assignment]
+            else:
+                _redis_client = Redis.from_url(
+                    str(settings.redis_url),
+                    decode_responses=True,
+                    health_check_interval=30,
+                    socket_connect_timeout=5,
+                    socket_timeout=5,
+                    retry_on_timeout=True,
+                )
 
     return _redis_client
 

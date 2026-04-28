@@ -5,8 +5,16 @@ from typing import Any
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.data import HeteroData
-from torch_geometric.nn import HeteroConv, SAGEConv
+
+try:  # optional dependency in some runtimes
+    from torch_geometric.data import HeteroData
+    from torch_geometric.nn import HeteroConv, SAGEConv
+    _TORCH_GEOMETRIC_AVAILABLE = True
+except Exception:  # pragma: no cover
+    HeteroData = Any  # type: ignore[misc,assignment]
+    HeteroConv = None  # type: ignore[assignment]
+    SAGEConv = None  # type: ignore[assignment]
+    _TORCH_GEOMETRIC_AVAILABLE = False
 
 
 class RightsGNN(nn.Module):
@@ -22,6 +30,10 @@ class RightsGNN(nn.Module):
     """
 
     def __init__(self, hidden_dim: int = 256, out_dim: int = 128, dropout: float = 0.1) -> None:
+        if not _TORCH_GEOMETRIC_AVAILABLE or HeteroConv is None or SAGEConv is None:
+            raise RuntimeError(
+                "torch_geometric is unavailable in this runtime. Install `torch-geometric` in the same environment as the backend process."
+            )
         super().__init__()
         self.hidden_dim = hidden_dim
         self.out_dim = out_dim

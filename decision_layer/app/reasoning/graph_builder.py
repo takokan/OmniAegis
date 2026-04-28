@@ -4,8 +4,15 @@ from typing import Any, Iterable
 
 import numpy as np
 import torch
-from torch_geometric.data import HeteroData
-from torch_geometric.transforms import ToUndirected
+
+try:  # optional dependency in some runtimes
+    from torch_geometric.data import HeteroData
+    from torch_geometric.transforms import ToUndirected
+    _TORCH_GEOMETRIC_AVAILABLE = True
+except Exception:  # pragma: no cover
+    HeteroData = Any  # type: ignore[misc,assignment]
+    ToUndirected = None  # type: ignore[assignment]
+    _TORCH_GEOMETRIC_AVAILABLE = False
 
 
 class GraphBuilder:
@@ -24,6 +31,10 @@ class GraphBuilder:
     """
 
     def __init__(self, flagged_edge_boost: float = 1.5, graph_db: Any | None = None) -> None:
+        if not _TORCH_GEOMETRIC_AVAILABLE or ToUndirected is None:
+            raise RuntimeError(
+                "torch_geometric is unavailable in this runtime. Install `torch-geometric` in the same environment as the backend process."
+            )
         self.flagged_edge_boost = flagged_edge_boost
         self._to_undirected = ToUndirected(merge=False)
         self.graph_db = graph_db
