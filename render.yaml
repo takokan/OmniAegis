@@ -11,7 +11,17 @@ services:
         value: "8000"
       - key: SKIP_STARTUP_DEPENDENCY_CHECK
         value: "1"
+      - key: API_HOST
+        value: "0.0.0.0"
+      - key: API_PORT
+        value: "8000"
+      - key: CORS_ORIGINS
+        sync: false
       - key: REDIS_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
         sync: false
       - key: DATABASE_URL
         sync: false
@@ -33,6 +43,16 @@ services:
         sync: false
       - key: WEB3_PROVIDER_URL
         sync: false
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT_PATH
+        sync: false
+      - key: FIRESTORE_USERS_COLLECTION
+        value: "users"
+      - key: AUTH_ADMIN_EMAIL
+        sync: false
 
   - type: web
     name: omniaegis-analysis-engine
@@ -45,4 +65,10 @@ services:
       - key: PORT
         value: "8090"
       - key: REDIS_URL
+        sync: false
+      - key: ANALYSIS_ENGINE_PORT
+        value: "8090"
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
         sync: false
