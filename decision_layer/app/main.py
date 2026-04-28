@@ -47,6 +47,7 @@ from app.batch_api import router as batch_router
 from app.fingerprinters import AudioFingerprinter, ImageFingerprinter, VideoFingerprinter
 from app.fingerprinters.image_features import ImageFeatureExtractor
 from app.hitl_api import router as hitl_router
+from app.governance_api import router as governance_router
 from app.xai_api import router as xai_router
 from app.registry import RegistryManager
 from app.schemas import FingerprintResponse, MatchItem, MatchResponse, Modality
@@ -342,6 +343,7 @@ app.add_middleware(PrometheusMiddleware, metrics=GLOBAL_METRICS)
 app.include_router(auth_router)
 app.include_router(batch_router)
 app.include_router(hitl_router)
+app.include_router(governance_router)
 app.include_router(xai_router)
 
 

@@ -75,6 +75,19 @@ class _UpstashRedisAdapter:
             args.extend([k, v])
         return await self.execute("XADD", stream, id, *args)
 
+    async def xrevrange(
+        self,
+        stream: str,
+        max_id: str = "+",
+        min_id: str = "-",
+        count: int | None = None,
+    ) -> Any:
+        cmd: list[Any] = ["XREVRANGE", stream, max_id, min_id]
+        if count is not None:
+            cmd.extend(["COUNT", int(count)])
+        resp = await self.execute(*cmd)
+        return resp or []
+
     async def zadd(self, key: str, mapping: dict[str, float]) -> Any:
         args: list[Any] = []
         for member, score in mapping.items():

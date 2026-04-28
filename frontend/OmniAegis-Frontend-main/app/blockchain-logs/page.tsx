@@ -25,8 +25,6 @@ type GovernanceAuditResponse = {
   }>;
 };
 
-const STORAGE_KEY = 'omniaegis:blockchain-logs';
-
 function randomHash(seed: string) {
   const safeSeed = seed.replace(/[^a-zA-Z0-9]/g, '').slice(0, 32).toLowerCase();
   return `0x${safeSeed.padEnd(64, '0').slice(0, 64)}`;
@@ -39,23 +37,11 @@ export default function BlockchainLogsPage() {
   const [newAction, setNewAction] = useState('');
   const [newActor, setNewActor] = useState('');
   const [newDetails, setNewDetails] = useState('');
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fromStorage = localStorage.getItem(STORAGE_KEY);
-    if (fromStorage) {
-      try {
-        const parsed = JSON.parse(fromStorage) as BlockchainLog[];
-        if (Array.isArray(parsed)) {
-          setLogs(parsed);
-          setLoading(false);
-          return;
-        }
-      } catch {
-        // Fall back to API bootstrap when cache is invalid.
-      }
-    }
-
-    async function bootstrapFromAudit() {
+    let cancelled = false;
+    async function syncFromAudit() {
       try {
         const res = await fetch('/api/governance/audit', { cache: 'no-store' });
         const data = (await res.json()) as GovernanceAuditResponse;
@@ -68,22 +54,23 @@ export default function BlockchainLogsPage() {
           blockNumber: 91000 + idx,
           details: (entry.details || 'No details provided.').toString(),
         }));
-        setLogs(mapped);
+        if (!cancelled) {
+          setLogs(mapped);
+          setSyncError(null);
+        }
       } catch {
-        setLogs([]);
+        if (!cancelled) setSyncError('Live governance stream unavailable');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
-
-    bootstrapFromAudit();
+    syncFromAudit();
+    const interval = window.setInterval(syncFromAudit, 3000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
   }, []);
-
-  useEffect(() => {
-    if (!loading) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
-    }
-  }, [logs, loading]);
 
   const filteredLogs = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
@@ -97,7 +84,7 @@ export default function BlockchainLogsPage() {
     );
   }, [logs, searchTerm]);
 
-  const handleAddLog = () => {
+  const handleAddLog = async () => {
     if (!newAction.trim() || !newActor.trim()) return;
     const now = new Date().toISOString();
     const record: BlockchainLog = {
@@ -113,6 +100,24 @@ export default function BlockchainLogsPage() {
     setNewAction('');
     setNewActor('');
     setNewDetails('');
+    try {
+      await fetch('/api/governance/audit', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          id: record.id,
+          action: record.action,
+          admin: record.actor,
+          timestamp: record.timestamp,
+          reasoningHash: record.txHash,
+          details: record.details,
+          policyVersion: 'manual-v1',
+        }),
+      });
+      setSyncError(null);
+    } catch {
+      setSyncError('Saved locally; failed to publish to governance stream');
+    }
   };
 
   return (
@@ -122,6 +127,9 @@ export default function BlockchainLogsPage() {
           <h1 className="text-4xl font-bold text-text-primary">Blockchain Logs</h1>
           <p className="text-lg text-text-secondary mt-1">
             Immutable-style ledger view for moderation and governance events
+          </p>
+          <p className="text-sm text-text-tertiary mt-2">
+            {loading ? 'Syncing stream...' : syncError || 'Live stream active'}
           </p>
         </div>
 
