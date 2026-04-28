@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { MainLayout } from '@/components/layout';
-import { Button, Input, DataTable } from '@/components/ui';
+import { Button, DataTable } from '@/components/ui';
 
 interface IngestItem {
   id: string;
@@ -351,22 +351,27 @@ export default function IngestExplorerPage() {
 
         {/* Filters */}
         <div className="p-4 bg-surface-secondary rounded-lg space-y-4 shadow-sm">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-            <Input
-              label="Search Items"
-              placeholder="Filename, ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-end">
+            <div className="lg:col-span-6">
+              <label className="block text-xs font-semibold text-text-secondary uppercase letter-spacing-wide mb-2">
+                Search Items
+              </label>
+              <input
+                placeholder="Filename, ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full h-10 px-3 rounded-md border border-border-default bg-surface-primary text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+              />
+            </div>
 
-            <div>
+            <div className="lg:col-span-2">
               <label className="block text-xs font-semibold text-text-secondary uppercase letter-spacing-wide mb-2">
                 Status
               </label>
               <select
                 value={filterStatus || ''}
                 onChange={(e) => setFilterStatus(e.target.value || null)}
-                className="w-full px-3 py-2 rounded-md border border-border-default bg-surface-primary text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full h-10 px-3 rounded-md border border-border-default bg-surface-primary text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent"
               >
                 <option value="">All Statuses</option>
                 {statusOptions.map((status) => (
@@ -377,14 +382,14 @@ export default function IngestExplorerPage() {
               </select>
             </div>
 
-            <div>
+            <div className="lg:col-span-2">
               <label className="block text-xs font-semibold text-text-secondary uppercase letter-spacing-wide mb-2">
                 Type
               </label>
               <select
                 value={filterType || ''}
                 onChange={(e) => setFilterType(e.target.value || null)}
-                className="w-full px-3 py-2 rounded-md border border-border-default bg-surface-primary text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full h-10 px-3 rounded-md border border-border-default bg-surface-primary text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent"
               >
                 <option value="">All Types</option>
                 {typeOptions.map((type) => (
@@ -395,11 +400,12 @@ export default function IngestExplorerPage() {
               </select>
             </div>
 
-            <div className="flex gap-2">
+            <div className="lg:col-span-2 flex gap-2 lg:justify-end">
               <Button
                 variant={viewMode === 'list' ? 'primary' : 'secondary'}
                 size="md"
                 onClick={() => setViewMode('list')}
+                className="h-10 min-w-[84px]"
               >
                 List
               </Button>
@@ -407,6 +413,7 @@ export default function IngestExplorerPage() {
                 variant={viewMode === 'grid' ? 'primary' : 'secondary'}
                 size="md"
                 onClick={() => setViewMode('grid')}
+                className="h-10 min-w-[84px]"
               >
                 Grid
               </Button>

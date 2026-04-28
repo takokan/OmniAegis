@@ -8,7 +8,7 @@ import logging
 import os
 import re
 from dataclasses import asdict, dataclass, field
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from heapq import heappush
 from html import unescape
 from html.parser import HTMLParser
@@ -372,7 +372,7 @@ class PrioritizedWebCrawler:
 					status_code=status_code,
 					content_digest=self._digest_text(f"{canonical}|{title}|{page_text[:12000]}"),
 					links_found=len(links),
-					fetched_at=datetime.now(UTC).isoformat(),
+					fetched_at=datetime.now(timezone.utc).isoformat(),
 					metadata={
 						"source_priority": seed.priority,
 						"final_url": final_url,

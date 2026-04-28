@@ -64,7 +64,7 @@ export default function LoginPage() {
                 <span className="text-xl font-bold text-accent">◆</span>
               </div>
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tight text-text-primary">SentinelAgent</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-text-primary">OmniAegis</h1>
                 <p className="text-sm text-text-secondary">Brand Protection & IP Monitoring Command Center</p>
               </div>
             </div>
@@ -160,7 +160,7 @@ export default function LoginPage() {
                 <input
                   type="submit"
                   disabled={isLoading}
-                  className="w-full rounded-2xl bg-accent hover:bg-accent/90 disabled:bg-surface-tertiary text-text-primary font-semibold py-3 transition shadow-lg shadow-accent/20 cursor-pointer"
+                  className="w-full rounded-2xl bg-accent hover:bg-accent/90 disabled:bg-surface-tertiary text-white font-semibold py-3 transition shadow-lg shadow-accent/20 cursor-pointer" 
                   value={isLoading ? 'Processing...' : mode === 'login' ? 'Sign in' : 'Create account'}
                 />
 
@@ -179,11 +179,11 @@ export default function LoginPage() {
                   disabled={isLoading}
                   className="w-full rounded-2xl border border-border-default bg-surface-primary hover:bg-surface-tertiary disabled:bg-surface-tertiary text-text-primary font-semibold py-3 transition flex items-center justify-center gap-3"
                 >
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
-                    <path
-                      fill="#EA4335"
-                      d="M12 11.8v4.7h6.6c-.3 1.5-1.8 4.3-6.6 4.3-4 0-7.2-3.3-7.2-7.3s3.2-7.3 7.2-7.3c2.3 0 3.8 1 4.7 1.8l3.2-3.1C17.7 2.9 15.1 2 12 2 6.5 2 2 6.5 2 12s4.5 10 10 10c5.8 0 9.6-4.1 9.6-9.8 0-.7-.1-1.2-.2-1.7H12z"
-                    />
+                  <svg className="h-5 w-5" viewBox="0 0 48 48" aria-hidden="true">
+                    <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.5 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.5 17.6 9.5 24 9.5z" />
+                    <path fill="#4285F4" d="M46.5 24.5c0-1.7-.1-2.9-.4-4.3H24v8.2h12.8c-.3 2-1.9 5-5.5 7.1l7.6 5.9c4.6-4.3 7.6-10.5 7.6-16.9z" />
+                    <path fill="#FBBC05" d="M10.4 28.7c-.5-1.5-.9-3.1-.9-4.7s.3-3.2.9-4.7l-7.8-6.1C.9 16.6 0 20.2 0 24s.9 7.4 2.6 10.8l7.8-6.1z" />
+                    <path fill="#34A853" d="M24 48c6.5 0 12-2.1 16-5.8l-7.6-5.9c-2.1 1.5-5 2.6-8.4 2.6-6.4 0-11.7-4-13.6-9.8l-7.8 6.1C6.5 42.6 14.6 48 24 48z" />
                   </svg>
                   {mode === 'login' ? 'Continue with Google' : 'Sign up with Google'}
                 </button>
@@ -192,19 +192,7 @@ export default function LoginPage() {
               {/* Demo Credentials */}
               {mode === 'login' && (
                 <div className="border-t border-border-default pt-6 space-y-3">
-                  <p className="text-xs uppercase tracking-[0.28em] text-text-tertiary">Demo Credentials</p>
-                  <div className="space-y-2 text-sm">
-                    <div className="rounded-2xl bg-surface-primary p-3">
-                      <p className="font-mono text-text-secondary">
-                        <span className="text-text-tertiary">Admin:</span> admin@sentinelai.com / admin123 (or admin / password)
-                      </p>
-                    </div>
-                    <div className="rounded-2xl bg-surface-primary p-3">
-                      <p className="font-mono text-text-secondary">
-                        <span className="text-text-tertiary">Reviewer:</span> reviewer@sentinelai.com / reviewer123 (or reviewer / password)
-                      </p>
-                    </div>
-                  </div>
+                  
                 </div>
               )}
 

@@ -14,7 +14,7 @@ from .config import Settings, get_settings
 logger = logging.getLogger(__name__)
 
 
-@dataclass(slots=True)
+@dataclass
 class SentinelMetrics:
     """Service-local Prometheus metrics bundle.
 

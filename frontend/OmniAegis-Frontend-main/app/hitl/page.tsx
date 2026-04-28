@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout';
 import {
   ConfidenceBadge,
-  StatusChip,
   Button,
   Input,
-  Toast,
 } from '@/components/ui';
 
 function AssetTypeIcon({ type }: { type: HITLTask['assetType'] }) {
@@ -360,18 +358,18 @@ export default function HITLBoardPage() {
     tasks: HITLTask[];
     accentColor: string;
   }) => (
-    <div className="flex flex-col rounded-xl bg-surface-secondary shadow-[0_10px_28px_rgba(16,24,40,0.08)] overflow-hidden">
-      <div className="px-4 py-3 bg-surface-tertiary/90">
-        <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+    <section className="snap-start flex flex-col rounded-2xl bg-surface-secondary shadow-[0_10px_28px_rgba(16,24,40,0.08)] overflow-hidden border border-border-subtle">
+      <header className="sticky top-0 z-10 px-4 py-3 bg-surface-tertiary/95 backdrop-blur supports-[backdrop-filter]:bg-surface-tertiary/80 border-b border-border-subtle">
+        <div className="flex items-center gap-2">
           <span className={`w-2 h-2 rounded-full ${accentColor}`} />
-          {title}
-          <span className="ml-auto text-xs font-normal text-text-tertiary">
+          <h3 className="text-sm font-semibold text-text-primary">{title}</h3>
+          <span className="ml-auto inline-flex items-center rounded-full bg-surface-elevated px-2 py-0.5 text-xs font-semibold text-text-secondary">
             {tasks.length}
           </span>
-        </h3>
-      </div>
+        </div>
+      </header>
 
-      <div className="flex-1 overflow-y-auto max-h-[calc(100vh-280px)]">
+      <div className="flex-1 overflow-y-auto max-h-[calc(100vh-320px)]">
         {tasks.length === 0 ? (
           <div className="p-4 text-center text-text-tertiary text-sm">
             No tasks
@@ -385,10 +383,10 @@ export default function HITLBoardPage() {
                   setSelectedTask(task);
                   setSelectedColumn(status);
                 }}
-                className={`p-3 rounded-lg cursor-pointer transition-all duration-fast shadow-sm ${
+                className={`p-3 rounded-xl cursor-pointer border transition-colors duration-150 ease-out ${
                   selectedTask?.id === task.id
-                    ? 'bg-surface-elevated shadow-[0_0_0_1px_rgba(108,99,255,0.28),0_10px_24px_rgba(108,99,255,0.12)]'
-                    : 'bg-surface-tertiary hover:bg-surface-elevated hover:shadow-md'
+                    ? 'bg-surface-elevated border-accent/30 shadow-[0_0_0_1px_rgba(108,99,255,0.22),0_10px_24px_rgba(108,99,255,0.10)]'
+                    : 'bg-surface-tertiary border-border-subtle hover:bg-surface-tertiary/80 hover:border-border-subtle hover:shadow-sm'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
@@ -422,7 +420,7 @@ export default function HITLBoardPage() {
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 
   return (
@@ -583,56 +581,92 @@ export default function HITLBoardPage() {
           </div>
 
           {/* Quick Stats */}
-          <div className="flex gap-4">
-            <div className="px-4 py-2 rounded-lg bg-danger bg-opacity-10 shadow-sm">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="rounded-2xl bg-surface-secondary border border-border-subtle p-4 shadow-sm">
               <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold">
                 Pending
               </p>
               <p className="text-2xl font-bold text-danger mt-1">{totalPending}</p>
             </div>
-            <div className="px-4 py-2 rounded-lg bg-warning bg-opacity-10 shadow-sm">
+            <div className="rounded-2xl bg-surface-secondary border border-border-subtle p-4 shadow-sm">
               <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold">
                 Reviewing
               </p>
               <p className="text-2xl font-bold text-warning mt-1">{totalReviewing}</p>
             </div>
+            <div className="rounded-2xl bg-surface-secondary border border-border-subtle p-4 shadow-sm">
+              <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold">
+                Approved
+              </p>
+              <p className="text-2xl font-bold text-success mt-1">{filteredTasks.approved.length}</p>
+            </div>
+            <div className="rounded-2xl bg-surface-secondary border border-border-subtle p-4 shadow-sm">
+              <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold">
+                Rejected
+              </p>
+              <p className="text-2xl font-bold text-danger mt-1">{filteredTasks.rejected.length}</p>
+            </div>
           </div>
         </div>
 
         {/* Search */}
-        <Input
-          label="Search Tasks"
-          placeholder="Audit ID, Asset ID..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        <div className="rounded-2xl bg-surface-secondary border border-border-subtle p-4">
+          <Input
+            label="Search Tasks"
+            placeholder="Audit ID, Asset ID..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
         {/* Kanban Board */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-          <Column
-            title="Pending"
-            status="pending"
-            tasks={filteredTasks.pending}
-            accentColor="bg-danger"
-          />
-          <Column
-            title="Reviewing"
-            status="reviewing"
-            tasks={filteredTasks.reviewing}
-            accentColor="bg-warning"
-          />
-          <Column
-            title="Approved"
-            status="approved"
-            tasks={filteredTasks.approved}
-            accentColor="bg-success"
-          />
-          <Column
-            title="Rejected"
-            status="rejected"
-            tasks={filteredTasks.rejected}
-            accentColor="bg-danger"
-          />
+        <div className="rounded-2xl bg-surface-primary border border-border-subtle p-3 md:p-4">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="text-sm font-semibold text-text-primary">Queue</div>
+            <div className="text-xs text-text-tertiary">
+              Tip: use <kbd className="px-1.5 py-0.5 bg-surface-secondary border border-border-default rounded font-mono text-accent">A</kbd>{' '}
+              / <kbd className="px-1.5 py-0.5 bg-surface-secondary border border-border-default rounded font-mono text-accent">R</kbd>{' '}
+              to approve/reject, <kbd className="px-1.5 py-0.5 bg-surface-secondary border border-border-default rounded font-mono text-accent">→</kbd>{' '}
+              for next
+            </div>
+          </div>
+
+          <div className="-mx-3 md:-mx-4 px-3 md:px-4 overflow-x-auto pb-2">
+            <div className="flex gap-4 min-w-[1080px] xl:min-w-0 xl:grid xl:grid-cols-4 xl:gap-4">
+              <div className="w-[260px] sm:w-[280px] lg:w-[300px] xl:w-auto">
+                <Column
+                  title="Pending"
+                  status="pending"
+                  tasks={filteredTasks.pending}
+                  accentColor="bg-danger"
+                />
+              </div>
+              <div className="w-[260px] sm:w-[280px] lg:w-[300px] xl:w-auto">
+                <Column
+                  title="Reviewing"
+                  status="reviewing"
+                  tasks={filteredTasks.reviewing}
+                  accentColor="bg-warning"
+                />
+              </div>
+              <div className="w-[260px] sm:w-[280px] lg:w-[300px] xl:w-auto">
+                <Column
+                  title="Approved"
+                  status="approved"
+                  tasks={filteredTasks.approved}
+                  accentColor="bg-success"
+                />
+              </div>
+              <div className="w-[260px] sm:w-[280px] lg:w-[300px] xl:w-auto">
+                <Column
+                  title="Rejected"
+                  status="rejected"
+                  tasks={filteredTasks.rejected}
+                  accentColor="bg-danger"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

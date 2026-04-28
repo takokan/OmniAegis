@@ -7,7 +7,7 @@ import tempfile
 import time
 import uuid
 from contextlib import asynccontextmanager
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from importlib import import_module
 from pathlib import Path
 from typing import Any
@@ -570,7 +570,7 @@ async def register_onboarding_content(
     assigned_id = asset_id or str(uuid.uuid4())
     modality = _guess_modality(file)
 
-    uploaded_at = datetime.now(UTC).isoformat()
+    uploaded_at = datetime.now(timezone.utc).isoformat()
     resolved_source = (source or "").strip() or "user-upload"
     resolved_title = (title or "").strip() or (file.filename or assigned_id)
     resolved_creator_id = (creator_id or "").strip() or owner_user_id

@@ -178,67 +178,6 @@ export default function OverviewPage() {
           ))}
         </div>
 
-        {/* Demo Buttons */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-text-primary">Component Examples</h2>
-
-          <div className="space-y-3">
-            <div>
-              <h3 className="text-sm font-medium text-text-secondary mb-3">Confidence Badges</h3>
-              <div className="flex items-center gap-6 p-4 bg-surface-secondary rounded-lg shadow-sm">
-                <div>
-                  <p className="text-xs text-text-secondary mb-2">High (≥0.80)</p>
-                  <ConfidenceBadge value={0.87} />
-                </div>
-                <div>
-                  <p className="text-xs text-text-secondary mb-2">Mid (0.20–0.79)</p>
-                  <ConfidenceBadge value={0.45} />
-                </div>
-                <div>
-                  <p className="text-xs text-text-secondary mb-2">Low (&lt;0.20)</p>
-                  <ConfidenceBadge value={0.12} />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-medium text-text-secondary mb-3">Status Chips</h3>
-              <div className="flex flex-wrap items-center gap-3 p-4 bg-surface-secondary rounded-lg shadow-sm">
-                <StatusChip status="approved" />
-                <StatusChip status="rejected" />
-                <StatusChip status="pending" />
-                <StatusChip status="flagged" />
-                <StatusChip status="anchored" />
-                <StatusChip status="reviewing" />
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-medium text-text-secondary mb-3">Buttons</h3>
-              <div className="flex flex-wrap items-center gap-3 p-4 bg-surface-secondary rounded-lg shadow-sm">
-                <Button variant="primary" size="md">
-                  Primary
-                </Button>
-                <Button variant="secondary" size="md">
-                  Secondary
-                </Button>
-                <Button variant="danger" size="md">
-                  Danger
-                </Button>
-                <Button variant="ghost" size="md">
-                  Ghost
-                </Button>
-                <Button disabled size="md">
-                  Disabled
-                </Button>
-                <Button isLoading size="md">
-                  Loading
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Audit Table */}
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-text-primary">Recent Audits</h2>
@@ -290,12 +229,6 @@ export default function OverviewPage() {
             rows={DEMO_AUDITS}
             onRowClick={(row) => setSelectedAudit(row)}
           />
-        </div>
-
-        {/* Modal Button */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-text-primary">Modal Example</h2>
-          <Button onClick={() => setShowModal(true)}>Open Modal</Button>
         </div>
       </div>
 

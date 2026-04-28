@@ -1,6 +1,7 @@
 'use client';
 
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 type ContentType = 'image' | 'video' | 'audio';
 
@@ -37,8 +38,13 @@ export default function ContentRegistrationModal({
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [result, setResult] = useState<unknown>(null);
+  const [mounted, setMounted] = useState(false);
 
   const accept = useMemo(() => ACCEPTS[contentType], [contentType]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) {
@@ -49,6 +55,24 @@ export default function ContentRegistrationModal({
     setSuccessMessage('');
     setResult(null);
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose]);
 
   const handleContentFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     setContentFile(event.target.files?.[0] ?? null);
@@ -127,6 +151,8 @@ export default function ContentRegistrationModal({
       setResult(payload);
       setSuccessMessage('Content registered successfully.');
       onSuccess?.(payload);
+      resetForm();
+      onClose();
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Content registration failed.');
     } finally {
@@ -134,16 +160,23 @@ export default function ContentRegistrationModal({
     }
   };
 
-  if (!isOpen) {
+  if (!isOpen || !mounted) {
     return null;
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-6 backdrop-blur-sm">
-      <div className="premium-panel relative w-full max-w-2xl overflow-hidden rounded-[2rem]">
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/72 px-4 py-6 backdrop-blur-[2px]"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className="premium-panel relative w-full max-w-2xl overflow-hidden rounded-3xl border border-border-default/70 shadow-[0_24px_70px_rgba(2,6,23,0.48)]">
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-violet-500" />
 
-        <div className="max-h-[90vh] overflow-y-auto p-6 sm:p-8">
+        <div className="max-h-[calc(100vh-48px)] overflow-y-auto p-6 sm:p-8">
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.32em] text-text-tertiary">Content Registration</p>
@@ -189,7 +222,7 @@ export default function ContentRegistrationModal({
                   type="file"
                   accept={accept}
                   onChange={handleContentFileChange}
-                  className="w-full rounded-2xl border border-dashed border-border-default bg-surface-elevated px-4 py-3 text-sm text-text-secondary file:mr-4 file:rounded-xl file:border-0 file:bg-accent file:px-4 file:py-2 file:text-sm file:font-semibold file:text-text-primary hover:bg-surface-tertiary"
+                  className="w-full rounded-2xl border border-dashed border-border-default bg-surface-elevated px-4 py-3 text-sm text-text-secondary file:mr-4 file:rounded-xl file:border-0 file:bg-accent file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:bg-surface-tertiary"
                 />
                 <p className="text-xs text-text-tertiary">Accepted format: {accept.replace('/*', '')}.</p>
               </div>
@@ -275,7 +308,7 @@ export default function ContentRegistrationModal({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 rounded-2xl bg-accent px-4 py-3 font-semibold text-text-primary shadow-lg shadow-accent/20 transition hover:bg-accent/90 disabled:cursor-not-allowed disabled:bg-surface-elevated"
+                className="flex-1 rounded-2xl bg-accent px-4 py-3 font-semibold text-white shadow-lg shadow-accent/20 transition hover:bg-accent/90 disabled:cursor-not-allowed disabled:bg-surface-elevated"
               >
                 {isSubmitting ? 'Registering...' : 'Register content'}
               </button>
@@ -292,6 +325,7 @@ export default function ContentRegistrationModal({
           </form>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

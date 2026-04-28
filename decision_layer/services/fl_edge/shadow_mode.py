@@ -38,7 +38,7 @@ class ShadowPolicy(Protocol):
     def __call__(self, state: SentinelState, data: Mapping[str, Any]) -> Any: ...
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class ShadowModeConfig:
     """Runtime configuration for Sentinel shadow-mode comparison logging."""
 
@@ -50,7 +50,7 @@ class ShadowModeConfig:
     logger_name: str = "sentinel.shadow"
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class ShadowRecord:
     """Serialized comparison record persisted for auditing and metrics."""
 
@@ -67,7 +67,7 @@ class ShadowRecord:
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class ShadowMetrics:
     """Aggregated shadow-mode metrics computed from persisted logs."""
 

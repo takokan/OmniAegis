@@ -4,7 +4,7 @@ import asyncio
 import json
 import logging
 import os
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any
 from uuid import uuid4
 
@@ -161,7 +161,7 @@ async def _process_web_candidate_async(asset_id: str, metadata: dict[str, Any]) 
                 "reasoning": result.reasoning,
                 "infringement_probability": result.infringement_probability,
             },
-            "queued_at": datetime.now(UTC).isoformat(),
+            "queued_at": datetime.now(timezone.utc).isoformat(),
         }
         await redis_client.zadd(HITL_QUEUE_KEY, {json.dumps(hitl_payload): priority})
 
@@ -207,7 +207,7 @@ async def process_asset_async(asset_id: str, metadata: dict[str, Any]) -> dict[s
             "asset_id": asset_id,
             "metadata": metadata,
             "inference": inference,
-            "queued_at": datetime.now(UTC).isoformat(),
+            "queued_at": datetime.now(timezone.utc).isoformat(),
         }
         await redis_client.zadd(HITL_QUEUE_KEY, {json.dumps(hitl_payload): priority})
 
@@ -345,7 +345,7 @@ class RedisStreamIngestor:
         payload = dict(fields)
         payload["retry_count"] = str(retry_count)
         payload["last_error"] = str(error)
-        payload["failed_at"] = datetime.now(UTC).isoformat()
+        payload["failed_at"] = datetime.now(timezone.utc).isoformat()
 
         if retry_count <= self.max_retries:
             try:

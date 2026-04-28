@@ -7,7 +7,7 @@ from typing import Any, ClassVar, Mapping, Sequence
 import numpy as np
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class SentinelState:
     """Normalized state vector for the SentinelAgent RL policy.
 

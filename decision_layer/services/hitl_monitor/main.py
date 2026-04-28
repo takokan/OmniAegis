@@ -5,7 +5,7 @@ import json
 import logging
 import os
 import time
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any
 
 try:
@@ -113,7 +113,7 @@ class HITLQueueWorker:
             retry_count += 1
             payload["retry_count"] = retry_count
             payload["last_error"] = str(exc)
-            payload["failed_at"] = datetime.now(UTC).isoformat()
+            payload["failed_at"] = datetime.now(timezone.utc).isoformat()
 
             if retry_count <= self.retry_limit:
                 # Re-queue with slight priority increase to prevent starvation.

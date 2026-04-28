@@ -108,7 +108,7 @@ class BatchCoordinatorError(RuntimeError):
     """Base error for Merkle batch coordination."""
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class BatchCoordinatorConfig:
     """Runtime configuration for 10-minute decision batching and anchoring."""
 
@@ -139,7 +139,7 @@ class BatchCoordinatorConfig:
         )
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class DecisionLeaf:
     """Canonical decision leaf used for Merkle construction."""
 
@@ -152,7 +152,7 @@ class DecisionLeaf:
     leaf_hash: bytes = field(repr=False)
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class MerkleNode:
     """In-memory Merkle node representation mirrored into PostgreSQL."""
 
@@ -166,7 +166,7 @@ class MerkleNode:
     is_leaf: bool = False
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class MerkleBatch:
     """Prepared batch metadata."""
 

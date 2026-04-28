@@ -43,7 +43,7 @@ except ModuleNotFoundError:  # pragma: no cover - lightweight fallback for envir
 from .state_space import SentinelState
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class RewardWeights:
     """Tunable reward terms for SentinelEnv."""
 
@@ -58,7 +58,7 @@ class RewardWeights:
     privacy_budget_penalty: float = -1.0
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class HistoricalOutcome:
     """Simulated environment outcome for a single Sentinel decision."""
 

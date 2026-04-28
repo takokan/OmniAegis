@@ -99,7 +99,7 @@ class HSMCompatibleSigner:
         raise TypeError("HSM signer callback must return bytes or hex string")
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class AuditServiceConfig:
     """Configuration for the Audit Layer blockchain bridge."""
 
@@ -136,7 +136,7 @@ class AuditServiceConfig:
         )
 
 
-@dataclass(slots=True)
+@dataclass
 class GasPriceSnapshot:
     """Current gas-price view used for transaction admission control."""
 
@@ -219,7 +219,7 @@ class GasPriceManager:
 PendingStage = Literal["ipfs", "tx"]
 
 
-@dataclass(slots=True)
+@dataclass
 class PendingAudit:
     """Serialized pending audit item for durable retry processing."""
 

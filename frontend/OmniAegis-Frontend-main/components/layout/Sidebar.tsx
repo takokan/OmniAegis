@@ -94,25 +94,45 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
 
-  const isActive = (href: string) => pathname === href || pathname?.startsWith(href);
+  const normalizePath = (p: string) => {
+    if (!p) return '/';
+    if (p === '/') return '/';
+    return p.endsWith('/') ? p.slice(0, -1) : p;
+  };
 
-  const renderNavItem = (item: NavItem, depth = 0) => (
-    <div key={item.href}>
+  const isActive = (href: string) => {
+    const current = normalizePath(pathname || '/');
+    const target = normalizePath(href);
+
+    // Root should only match root (otherwise it matches everything)
+    if (target === '/') return current === '/';
+
+    // Exact match, or "section match" for nested routes like /hitl/queue
+    return current === target || current.startsWith(`${target}/`);
+  };
+
+  const renderNavItem = (item: NavItem, depth = 0) => {
+    const active = isActive(item.href);
+
+    return (
+    <div key={item.href} className={collapsed ? 'flex justify-center' : undefined}>
       <Link
         href={item.href}
         title={collapsed ? item.label : undefined}
-        className={`relative flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-fast group ${
-          isActive(item.href)
+        className={`relative flex items-center rounded-xl text-sm font-medium transition-all duration-fast group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 ${
+          collapsed ? 'w-10 justify-center px-0 py-2' : 'justify-between px-3 py-2.5'
+        } ${
+          active
             ? 'bg-accent-muted text-text-primary shadow-[inset_0_0_0_1px_rgba(108,99,255,0.24)]'
             : 'text-text-secondary hover:text-text-primary hover:bg-surface-tertiary'
         }`}
         style={{
-          paddingLeft: collapsed ? '12px' : `${12 + depth * 12}px`,
+          paddingLeft: collapsed ? undefined : `${12 + depth * 12}px`,
         }}
       >
-        <div className="flex items-center gap-2 min-w-0">
+        <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2 min-w-0'}`}>
           <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-surface-primary/40">
-            <NavIcon icon={item.icon} active={isActive(item.href)} />
+            <NavIcon icon={item.icon} active={active} />
           </span>
           {!collapsed && (
             <span className="truncate text-xs">{item.label}</span>
@@ -125,14 +145,15 @@ export function Sidebar({
         )}
         {item.badge !== undefined && item.badge > 0 && collapsed && (
           <span
-            className="absolute -right-2 -top-2 w-4 h-4 rounded-full bg-danger text-text-primary text-2xs flex items-center justify-center font-bold"
+            className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-danger text-text-primary text-2xs flex items-center justify-center font-bold"
           >
             {item.badge}
           </span>
         )}
       </Link>
     </div>
-  );
+    );
+  };
 
   return (
     <aside
@@ -140,7 +161,7 @@ export function Sidebar({
         collapsed ? 'w-16' : 'w-60'
       }`}
     >
-      <div className="p-3 space-y-4">
+      <div className={`${collapsed ? 'p-2' : 'p-3'} space-y-4`}>
         {/* Main Nav */}
         <nav className="space-y-1">
           {items.map((item) => renderNavItem(item))}
@@ -152,7 +173,9 @@ export function Sidebar({
         <nav className="space-y-1">
           <button
             onClick={() => onCollapsedChange?.(!collapsed)}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors"
+            className={`w-full flex items-center rounded-md text-sm text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors ${
+              collapsed ? 'justify-center px-2 py-2' : 'gap-2 px-3 py-2'
+            }`}
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             <span className="text-base">{collapsed ? '→' : '←'}</span>

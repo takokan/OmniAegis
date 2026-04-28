@@ -32,15 +32,15 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseClasses =
-    'inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-fast font-feature-settings text-sm disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2';
+    'inline-flex items-center justify-center gap-2 font-semibold rounded-lg border border-transparent transition-colors duration-150 ease-out font-feature-settings text-sm disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 active:translate-y-px';
 
   const variantClasses: Record<ButtonVariant, string> = {
     primary:
-      'bg-accent text-text-inverse hover:bg-accent-hover focus-visible:outline-accent shadow-sm hover:shadow-md',
+      'bg-accent text-white hover:bg-[#5E57E6] active:bg-[#524BCF] focus-visible:outline-accent shadow-[0_4px_10px_rgba(92,84,230,0.26)] hover:shadow-[0_6px_14px_rgba(92,84,230,0.32)]',
     secondary:
-      'bg-surface-tertiary text-text-primary hover:bg-surface-elevated focus-visible:outline-accent',
+      'bg-surface-secondary border-border-default text-text-primary hover:bg-surface-elevated hover:border-border-strong focus-visible:outline-accent',
     danger:
-      'bg-danger-bg text-danger hover:bg-danger/20 focus-visible:outline-danger',
+      'bg-danger-bg border-danger/20 text-danger hover:bg-danger/20 hover:border-danger/30 focus-visible:outline-danger',
     ghost:
       'bg-transparent text-text-primary hover:bg-surface-tertiary focus-visible:outline-accent',
   };
