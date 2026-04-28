@@ -9,14 +9,14 @@ const config: Config = {
       colors: {
         /* Primary Surfaces */
         surface: {
-          primary: '#0D0E12',
-          secondary: '#13151C',
-          tertiary: '#1A1D27',
-          elevated: '#21253A',
+          primary: 'rgb(var(--color-bg-primary-rgb) / <alpha-value>)',
+          secondary: 'rgb(var(--color-bg-secondary-rgb) / <alpha-value>)',
+          tertiary: 'rgb(var(--color-bg-tertiary-rgb) / <alpha-value>)',
+          elevated: 'rgb(var(--color-bg-elevated-rgb) / <alpha-value>)',
         },
         /* Brand Accent */
         accent: {
-          DEFAULT: '#6C63FF',
+          DEFAULT: 'rgb(var(--color-accent-rgb) / <alpha-value>)',
           hover: '#7B74FF',
           muted: '#6C63FF22',
           glow: '#6C63FF44',
@@ -30,17 +30,17 @@ const config: Config = {
         },
         /* Borders */
         border: {
-          DEFAULT: 'rgba(255, 255, 255, 0.06)',
-          strong: 'rgba(255, 255, 255, 0.12)',
-          subtle: 'rgba(255, 255, 255, 0.03)',
-          standard: 'rgba(255, 255, 255, 0.05)',
+          DEFAULT: 'rgb(var(--color-border-default-rgb) / <alpha-value>)',
+          strong: 'rgb(var(--color-border-strong-rgb) / <alpha-value>)',
+          subtle: 'rgb(var(--color-border-subtle-rgb) / 0.05)',
+          standard: 'rgb(var(--color-border-standard-rgb) / 0.08)',
         },
         /* Text */
         text: {
-          primary: '#E8EAF6',
-          secondary: '#8B93B0',
-          tertiary: '#62666D',
-          disabled: '#4A5070',
+          primary: 'rgb(var(--color-text-primary-rgb) / <alpha-value>)',
+          secondary: 'rgb(var(--color-text-secondary-rgb) / <alpha-value>)',
+          tertiary: 'rgb(var(--color-text-tertiary-rgb) / <alpha-value>)',
+          disabled: 'rgb(var(--color-text-disabled-rgb) / <alpha-value>)',
         },
       },
 

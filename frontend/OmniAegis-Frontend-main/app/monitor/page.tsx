@@ -103,11 +103,11 @@ export default function ModelMonitorPage() {
   if (user && user.role !== 'admin') {
     return (
       <div className="min-h-screen flex items-center justify-center p-8">
-        <div className="max-w-lg w-full text-center p-8 rounded-lg border border-border-default bg-surface-secondary">
+        <div className="max-w-lg w-full text-center p-8 rounded-lg bg-surface-secondary shadow-md">
           <h2 className="text-xl font-semibold text-text-primary">Not authorized</h2>
           <p className="text-sm text-text-secondary mt-2">You do not have permission to view the Model Monitor. Contact an administrator if you believe this is an error.</p>
           <div className="mt-4">
-            <a href="/" className="inline-block px-4 py-2 rounded-md bg-accent text-white">Return to Overview</a>
+            <a href="/" className="inline-block px-4 py-2 rounded-md bg-accent text-text-primary">Return to Overview</a>
           </div>
         </div>
       </div>
@@ -267,7 +267,7 @@ export default function ModelMonitorPage() {
         </div>
 
         {/* Active Model Summary */}
-        <div className="p-6 rounded-lg border border-border-default bg-surface-secondary">
+        <div className="p-6 rounded-lg bg-surface-secondary shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold mb-2">
@@ -321,7 +321,7 @@ export default function ModelMonitorPage() {
             </div>
           </div>
 
-          <div className="p-6 rounded-lg border border-border-default bg-surface-secondary">
+          <div className="p-6 rounded-lg bg-surface-secondary shadow-sm">
             {/* Simple Bar Chart */}
             <div className="space-y-3">
               {filteredDrift.map((point) => (

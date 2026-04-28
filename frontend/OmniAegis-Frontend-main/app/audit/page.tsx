@@ -264,7 +264,7 @@ export default function AuditConsolePage() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 rounded-lg border border-border-default bg-surface-secondary">
+          <div className="p-4 rounded-lg bg-surface-secondary shadow-sm">
             <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold mb-2">
               Total Audits
             </p>
@@ -272,7 +272,7 @@ export default function AuditConsolePage() {
             <p className="text-xs text-text-tertiary mt-2">24h period</p>
           </div>
 
-          <div className="p-4 rounded-lg border border-border-default bg-surface-secondary">
+          <div className="p-4 rounded-lg bg-surface-secondary shadow-sm">
             <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold mb-2">
               Approved
             </p>
@@ -282,7 +282,7 @@ export default function AuditConsolePage() {
             <p className="text-xs text-text-tertiary mt-2">High confidence</p>
           </div>
 
-          <div className="p-4 rounded-lg border border-border-default bg-surface-secondary">
+          <div className="p-4 rounded-lg bg-surface-secondary shadow-sm">
             <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold mb-2">
               Pending Review
             </p>
@@ -292,7 +292,7 @@ export default function AuditConsolePage() {
             <p className="text-xs text-text-tertiary mt-2">Awaiting HITL</p>
           </div>
 
-          <div className="p-4 rounded-lg border border-border-default bg-surface-secondary">
+          <div className="p-4 rounded-lg bg-surface-secondary shadow-sm">
             <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold mb-2">
               Flagged
             </p>
@@ -304,7 +304,7 @@ export default function AuditConsolePage() {
         </div>
 
         {/* Filters */}
-        <div className="p-4 bg-surface-secondary rounded-lg border border-border-default space-y-4">
+        <div className="p-4 bg-surface-secondary rounded-lg space-y-4 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <Input
               label="Search Audits"

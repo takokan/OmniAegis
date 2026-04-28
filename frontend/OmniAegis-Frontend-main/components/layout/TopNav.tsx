@@ -72,7 +72,7 @@ export function TopNav({
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-md bg-accent flex items-center justify-center text-white font-bold text-sm">
+              <div className="w-8 h-8 rounded-md bg-accent flex items-center justify-center text-text-primary font-bold text-sm">
                 ◆
               </div>
               <span className="font-semibold text-text-primary hidden sm:inline">OmniAegis</span>
@@ -160,7 +160,7 @@ export function TopNav({
                 <path strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M13.73 21a2 2 0 01-3.46 0" />
               </svg>
               {notificationCount > 0 && (
-                <span className="absolute top-0 right-0 w-5 h-5 bg-danger text-white text-2xs rounded-full flex items-center justify-center font-bold">
+                <span className="absolute top-0 right-0 w-5 h-5 bg-danger text-text-primary text-2xs rounded-full flex items-center justify-center font-bold">
                   {notificationCount > 9 ? '9+' : notificationCount}
                 </span>
               )}
@@ -189,7 +189,7 @@ export function TopNav({
               className="flex items-center gap-2 px-3 py-2 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-tertiary transition-colors"
               aria-label="User menu"
             >
-              <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center text-text-primary text-xs font-bold">
                 {userName.charAt(0).toUpperCase()}
               </div>
               <span className="hidden sm:inline text-sm">{userName}</span>

@@ -111,7 +111,7 @@ export function Sidebar({
         }}
       >
         <div className="flex items-center gap-2 min-w-0">
-          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-white/[0.02]">
+          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-surface-primary/40">
             <NavIcon icon={item.icon} active={isActive(item.href)} />
           </span>
           {!collapsed && (
@@ -119,13 +119,13 @@ export function Sidebar({
           )}
         </div>
         {item.badge !== undefined && item.badge > 0 && !collapsed && (
-          <span className="ml-auto flex-shrink-0 px-2 py-0.5 rounded-full bg-danger text-white text-2xs font-bold">
+          <span className="ml-auto flex-shrink-0 px-2 py-0.5 rounded-full bg-danger text-text-primary text-2xs font-bold">
             {item.badge > 9 ? '9+' : item.badge}
           </span>
         )}
         {item.badge !== undefined && item.badge > 0 && collapsed && (
           <span
-            className="absolute -right-2 -top-2 w-4 h-4 rounded-full bg-danger text-white text-2xs flex items-center justify-center font-bold"
+            className="absolute -right-2 -top-2 w-4 h-4 rounded-full bg-danger text-text-primary text-2xs flex items-center justify-center font-bold"
           >
             {item.badge}
           </span>

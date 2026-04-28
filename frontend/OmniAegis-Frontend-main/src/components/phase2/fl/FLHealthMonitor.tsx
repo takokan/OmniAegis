@@ -25,15 +25,15 @@ const FLHealthMonitor: React.FC<{ nodes?: EdgeNode[] }> = ({ nodes = [] }) => {
     <ErrorBoundary>
       <GlassCard>
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm text-gray-200">FL Health Monitor</h3>
+          <h3 className="text-sm text-text-primary">FL Health Monitor</h3>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {nodes.map(n => (
             <div key={n.id} className="flex items-center gap-3 p-2">
               <StatusRing status={n.status} />
               <div className="flex flex-col">
-                <div className="text-sm text-gray-200">{n.label || n.id}</div>
-                <div className="text-xs text-gray-400">{n.status}</div>
+                <div className="text-sm text-text-primary">{n.label || n.id}</div>
+                <div className="text-xs text-text-secondary">{n.status}</div>
               </div>
             </div>
           ))}

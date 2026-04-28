@@ -29,7 +29,7 @@ export default function TrainingLoopMonitor() {
 
   if (!data) {
     return (
-      <div className="h-80 rounded-[1.75rem] border border-slate-200/80 bg-slate-50/80 flex items-center justify-center text-slate-500">
+      <div className="h-80 rounded-[1.75rem] bg-surface-elevated flex items-center justify-center text-text-secondary shadow-sm">
         <p className="text-sm">Loading training metrics...</p>
       </div>
     );
@@ -69,8 +69,8 @@ export default function TrainingLoopMonitor() {
             onClick={() => setActiveMetric(metric)}
             className={`flex-1 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
               activeMetric === metric
-                ? `bg-gradient-to-r ${getMetricColor(metric)} text-white`
-                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                ? `bg-gradient-to-r ${getMetricColor(metric)} text-text-primary`
+                : 'bg-surface-tertiary text-text-secondary hover:bg-surface-elevated'
             }`}
           >
             {getMetricLabel(metric)}
@@ -80,17 +80,17 @@ export default function TrainingLoopMonitor() {
 
       {/* Current Values */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-3xl bg-gradient-to-br from-sky-50 to-sky-100 p-6 border border-sky-200">
+        <div className="rounded-3xl bg-surface-elevated p-6 shadow-sm">
           <p className="text-xs uppercase tracking-[0.28em] text-sky-600">KL Divergence</p>
           <p className="mt-2 text-3xl font-bold text-sky-900">{currentMetrics.klDiv.toFixed(4)}</p>
           <p className="mt-1 text-xs text-sky-700">Round {data.currentRound} / {data.totalRounds}</p>
         </div>
-        <div className="rounded-3xl bg-gradient-to-br from-emerald-50 to-emerald-100 p-6 border border-emerald-200">
+        <div className="rounded-3xl bg-surface-elevated p-6 shadow-sm">
           <p className="text-xs uppercase tracking-[0.28em] text-emerald-600">Reward Mean</p>
           <p className="mt-2 text-3xl font-bold text-emerald-900">{currentMetrics.reward.toFixed(2)}</p>
           <p className="mt-1 text-xs text-emerald-700">Converging ↑</p>
         </div>
-        <div className="rounded-3xl bg-gradient-to-br from-red-50 to-red-100 p-6 border border-red-200">
+        <div className="rounded-3xl bg-surface-elevated p-6 shadow-sm">
           <p className="text-xs uppercase tracking-[0.28em] text-red-600">Loss</p>
           <p className="mt-2 text-3xl font-bold text-red-900">{currentMetrics.loss.toFixed(4)}</p>
           <p className="mt-1 text-xs text-red-700">Decreasing ↓</p>
@@ -98,8 +98,8 @@ export default function TrainingLoopMonitor() {
       </div>
 
       {/* Timeline Chart */}
-      <div className="rounded-3xl border border-slate-200/70 bg-white/85 p-6 space-y-4">
-        <p className="text-sm font-semibold text-slate-900">Training Progress</p>
+      <div className="premium-card rounded-3xl p-6 space-y-4">
+        <p className="text-sm font-semibold text-text-primary">Training Progress</p>
         <div className="space-y-3">
           {data.metrics.map((metric, idx) => {
             const scale = getScale(activeMetric);
@@ -109,15 +109,15 @@ export default function TrainingLoopMonitor() {
             return (
               <div key={metric.round} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-600">
+                  <span className="text-text-secondary">
                     Round {metric.round} •{' '}
                     {new Date(metric.timestamp).toLocaleTimeString()}
                   </span>
-                  <span className="font-mono font-semibold text-slate-900">
+                  <span className="font-mono font-semibold text-text-primary">
                     {value.toFixed(4)}
                   </span>
                 </div>
-                <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
+                <div className="h-2 rounded-full bg-surface-primary overflow-hidden">
                   <div
                     className={`h-full bg-gradient-to-r ${getMetricColor(activeMetric)} transition-all duration-300`}
                     style={{ width: `${percentage}%` }}
@@ -130,7 +130,7 @@ export default function TrainingLoopMonitor() {
       </div>
 
       {/* Training Status */}
-      <div className="rounded-3xl bg-emerald-50 border border-emerald-200 p-6">
+      <div className="rounded-3xl bg-emerald-500/10 p-6 shadow-sm">
         <p className="text-sm font-semibold text-emerald-900">✓ Training Status: Converged</p>
         <p className="text-xs text-emerald-700 mt-2">
           All metrics show positive convergence. Model is ready for promotion to live.

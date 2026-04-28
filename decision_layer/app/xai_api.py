@@ -201,3 +201,28 @@ async def umap_health(
     if projector is None:
         raise HTTPException(status_code=503, detail="UMAP projector not initialized")
     return {"status": "ok", "service": "umap_projector"}
+
+
+@router.get("/graph/{asset_id}")
+async def get_asset_relationship_graph(
+    asset_id: str,
+    request: Request,
+    _current_user: AuthUser = Depends(get_current_user),
+) -> dict[str, Any]:
+    graph_db = getattr(request.app.state, "graph_db", None)
+    if graph_db is None:
+        raise HTTPException(status_code=503, detail="Graph database is not initialized")
+
+    normalized_asset_id = asset_id.strip()
+    if not normalized_asset_id:
+        raise HTTPException(status_code=400, detail="asset_id is required")
+
+    try:
+        graph = graph_db.fetch_asset_relationship_graph(normalized_asset_id)
+    except Exception as exc:  # pragma: no cover - defensive path
+        raise HTTPException(status_code=500, detail=f"Failed to load graph relationships: {exc}") from exc
+
+    if not graph.get("nodes"):
+        raise HTTPException(status_code=404, detail="No graph relationships found for the requested asset")
+
+    return graph

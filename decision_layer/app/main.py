@@ -7,6 +7,7 @@ import tempfile
 import time
 import uuid
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 from importlib import import_module
 from pathlib import Path
 from typing import Any
@@ -427,6 +428,48 @@ def _build_image_explanation(content: bytes, top_k: int, owner_user_id: str | No
     }
 
 
+def _guess_modality(upload: UploadFile) -> Modality:
+    content_type = (upload.content_type or "").lower()
+    filename = (upload.filename or "").lower()
+
+    if content_type.startswith("image/") or filename.endswith((".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif")):
+        return Modality.image
+    if content_type.startswith("video/") or filename.endswith((".mp4", ".mov", ".avi", ".mkv", ".webm")):
+        return Modality.video
+    if content_type.startswith("audio/") or filename.endswith((".mp3", ".wav", ".m4a", ".aac", ".flac", ".ogg")):
+        return Modality.audio
+
+    raise HTTPException(status_code=400, detail="Unsupported file type. Upload an image, video, or audio asset.")
+
+
+async def _read_upload_bytes(upload: UploadFile, label: str) -> bytes:
+    try:
+        content = await upload.read()
+    except Exception as exc:  # pragma: no cover - defensive path
+        raise HTTPException(status_code=400, detail=f"Failed to read {label}: {exc}") from exc
+
+    if not content:
+        raise HTTPException(status_code=400, detail=f"Uploaded {label} is empty")
+
+    return content
+
+
+def _sanitize_match_neighbors(results: list[Any]) -> list[dict[str, Any]]:
+    neighbors: list[dict[str, Any]] = []
+    for match in results:
+        metadata = dict(getattr(match, "metadata", {}) or {})
+        neighbors.append(
+            {
+                "asset_id": getattr(match, "asset_id", ""),
+                "similarity": float(getattr(match, "distance_or_similarity", 0.0)),
+                "is_flagged": bool(metadata.get("is_flagged", False)),
+                "modality": metadata.get("modality"),
+                "flagged_weight": float(metadata.get("flagged_weight", 1.5)),
+            }
+        )
+    return [neighbor for neighbor in neighbors if neighbor.get("asset_id")]
+
+
 @app.post("/fingerprint/image", response_model=FingerprintResponse)
 async def fingerprint_image(
     file: UploadFile = File(...),
@@ -503,6 +546,224 @@ async def fingerprint_image(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:  # pragma: no cover - defensive path
         raise HTTPException(status_code=500, detail=f"Image fingerprinting failed: {exc}") from exc
+
+
+@app.post("/onboarding/register")
+async def register_onboarding_content(
+    file: UploadFile = File(...),
+    license: UploadFile = File(...),
+    user_id: str = Form(...),
+    asset_id: str | None = Form(None),
+    source: str | None = Form(None),
+    title: str | None = Form(None),
+    creator_id: str | None = Form(None),
+    licensee_id: str | None = Form(None),
+    top_k: int = Form(5),
+) -> dict[str, Any]:
+    if top_k < 1 or top_k > 25:
+        raise HTTPException(status_code=400, detail="top_k must be between 1 and 25")
+
+    registry = _registry()
+    owner_user_id = _normalize_user_id(user_id, required=True)
+    content = await _read_upload_bytes(file, "content file")
+    _license_content = await _read_upload_bytes(license, "license file")
+    assigned_id = asset_id or str(uuid.uuid4())
+    modality = _guess_modality(file)
+
+    uploaded_at = datetime.now(UTC).isoformat()
+    resolved_source = (source or "").strip() or "user-upload"
+    resolved_title = (title or "").strip() or (file.filename or assigned_id)
+    resolved_creator_id = (creator_id or "").strip() or owner_user_id
+    resolved_licensee_id = (licensee_id or "").strip() or f"{owner_user_id}:license"
+
+    base_metadata = {
+        "asset_id": assigned_id,
+        "modality": modality.value,
+        "filename": file.filename,
+        "title": resolved_title,
+        "source": resolved_source,
+        "user_id": owner_user_id,
+        "creator_id": resolved_creator_id,
+        "creator_trust_score": 0.8,
+        "creator_tenure_months": 12.0,
+        "creator_verified": True,
+        "licensee_id": resolved_licensee_id,
+        "license_status": 1.0,
+        "license_file_name": license.filename,
+        "license_content_type": license.content_type,
+        "authorization_status": "licensed",
+        "uploaded_at": uploaded_at,
+        "source_tier": "registered",
+        "is_flagged": False,
+    }
+
+    response_payload: dict[str, Any] = {
+        "asset_id": assigned_id,
+        "modality": modality.value,
+        "registered": True,
+        "qdrant_storage": {},
+        "graph": {"query_asset_id": assigned_id, "nodes": [], "edges": []},
+    }
+
+    try:
+        if modality == Modality.image:
+            fp = image_fp.fingerprint_from_bytes(content)
+            semantic_matches: list[Any] = []
+            embedding_for_graph: Any | None = None
+
+            if image_feature_extractor is not None:
+                features = image_feature_extractor.embed_from_bytes(content)
+                embedding_for_graph = features["embedding"]
+                semantic_matches = registry.match_semantic(
+                    embedding=features["embedding"],
+                    top_k=top_k,
+                    modality_filter="image",
+                    owner_user_id=owner_user_id,
+                )
+                registry.register_semantic(
+                    asset_id=assigned_id,
+                    embedding=features["embedding"],
+                    metadata={
+                        **base_metadata,
+                        "feature_type": "visual_features",
+                        "embedding_dim": features["embedding_dim"],
+                    },
+                )
+                response_payload["qdrant_storage"]["visual_features"] = {
+                    "collection": "semantic_assets",
+                    "embedding_dim": features["embedding_dim"],
+                }
+
+            registry.register_image(
+                asset_id=assigned_id,
+                hash_bytes=fp["hash_bytes"],
+                metadata=base_metadata,
+            )
+            response_payload["qdrant_storage"]["fingerprint"] = {
+                "collection": "image_assets",
+                "hash_hex": fp["hash_hex"],
+                "hash_size_bits": fp["hash_size_bits"],
+            }
+
+            if embedding_for_graph is not None and getattr(app.state, "graph_builder", None) is not None:
+                try:
+                    app.state.graph_builder.build_subgraph(
+                        query_embedding=embedding_for_graph,
+                        qdrant_results=semantic_matches,
+                        query_metadata={
+                            **base_metadata,
+                            "decision_label": "REGISTERED",
+                            "decision_confidence": 1.0,
+                        },
+                    )
+                except Exception as exc:
+                    logger.warning("Graph builder skipped for onboarding image asset %s: %s", assigned_id, exc)
+            elif app.state.graph_db is not None:
+                app.state.graph_db.upsert_asset_context(
+                    asset_id=assigned_id,
+                    metadata={
+                        **base_metadata,
+                        "decision_label": "REGISTERED",
+                        "decision_confidence": 1.0,
+                    },
+                    neighbors=_sanitize_match_neighbors(semantic_matches),
+                )
+
+            response_payload["matches"] = [
+                {
+                    "asset_id": match.asset_id,
+                    "score": match.distance_or_similarity,
+                    "confidence": match.confidence,
+                    "metadata": match.metadata,
+                }
+                for match in semantic_matches
+                if match.asset_id != assigned_id
+            ]
+
+        elif modality == Modality.audio:
+            suffix = os.path.splitext(file.filename or "")[1]
+            tmp_path = tempfile.NamedTemporaryFile(delete=False, suffix=suffix).name
+            try:
+                with open(tmp_path, "wb") as tmp_file:
+                    tmp_file.write(content)
+                fp = audio_fp.fingerprint(tmp_path)
+            finally:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+
+            audio_matches = registry.match_audio(fp["embedding"], top_k=top_k, owner_user_id=owner_user_id)
+            registry.register_audio(asset_id=assigned_id, embedding=fp["embedding"], metadata=base_metadata)
+            response_payload["qdrant_storage"]["embedding"] = {
+                "collection": "audio_assets",
+                "embedding_dim": fp["embedding_dim"],
+                "fingerprint_id": fp["fingerprint_id"],
+            }
+            if app.state.graph_db is not None:
+                app.state.graph_db.upsert_asset_context(
+                    asset_id=assigned_id,
+                    metadata={**base_metadata, "decision_label": "REGISTERED", "decision_confidence": 1.0},
+                    neighbors=_sanitize_match_neighbors(audio_matches),
+                )
+            response_payload["matches"] = [
+                {
+                    "asset_id": match.asset_id,
+                    "score": match.distance_or_similarity,
+                    "confidence": match.confidence,
+                    "metadata": match.metadata,
+                }
+                for match in audio_matches
+                if match.asset_id != assigned_id
+            ]
+
+        else:
+            suffix = os.path.splitext(file.filename or "")[1]
+            tmp_path = tempfile.NamedTemporaryFile(delete=False, suffix=suffix).name
+            try:
+                with open(tmp_path, "wb") as tmp_file:
+                    tmp_file.write(content)
+                fp = video_fp.fingerprint(tmp_path)
+            finally:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+
+            video_matches = registry.match_video(
+                fp["aggregate_hash_bytes"],
+                top_k=top_k,
+                owner_user_id=owner_user_id,
+            )
+            registry.register_video(asset_id=assigned_id, hash_bytes=fp["aggregate_hash_bytes"], metadata=base_metadata)
+            response_payload["qdrant_storage"]["fingerprint"] = {
+                "collection": "video_assets",
+                "frames_sampled": fp["frames_sampled"],
+                "aggregate_hash_hex": fp["aggregate_hash_hex"],
+            }
+            if app.state.graph_db is not None:
+                app.state.graph_db.upsert_asset_context(
+                    asset_id=assigned_id,
+                    metadata={**base_metadata, "decision_label": "REGISTERED", "decision_confidence": 1.0},
+                    neighbors=_sanitize_match_neighbors(video_matches),
+                )
+            response_payload["matches"] = [
+                {
+                    "asset_id": match.asset_id,
+                    "score": match.distance_or_similarity,
+                    "confidence": match.confidence,
+                    "metadata": match.metadata,
+                }
+                for match in video_matches
+                if match.asset_id != assigned_id
+            ]
+
+        if app.state.graph_db is not None:
+            response_payload["graph"] = app.state.graph_db.fetch_asset_relationship_graph(assigned_id)
+
+        return response_payload
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except HTTPException:
+        raise
+    except Exception as exc:  # pragma: no cover - defensive path
+        raise HTTPException(status_code=500, detail=f"Onboarding registration failed: {exc}") from exc
 
 
 @app.post("/fingerprint/semantic/image")

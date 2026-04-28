@@ -30,7 +30,7 @@ export default function ConstraintOverrideLog() {
 
   if (!data) {
     return (
-      <div className="h-80 rounded-[1.75rem] border border-slate-200/80 bg-slate-50/80 flex items-center justify-center text-slate-500">
+      <div className="h-80 rounded-[1.75rem] bg-surface-elevated flex items-center justify-center text-text-secondary shadow-sm">
         <p className="text-sm">Loading constraint log...</p>
       </div>
     );
@@ -52,15 +52,15 @@ export default function ConstraintOverrideLog() {
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-3xl bg-slate-50/75 p-4">
-          <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Total Intercepted</p>
-          <p className="mt-2 text-3xl font-bold text-slate-950">{data.total}</p>
+        <div className="rounded-3xl bg-surface-elevated p-4 shadow-sm">
+          <p className="text-xs uppercase tracking-[0.28em] text-text-tertiary">Total Intercepted</p>
+          <p className="mt-2 text-3xl font-bold text-text-primary">{data.total}</p>
         </div>
-        <div className="rounded-3xl bg-emerald-50 border border-emerald-200 p-4">
+        <div className="rounded-3xl bg-emerald-500/10 p-4 shadow-sm">
           <p className="text-xs uppercase tracking-[0.28em] text-emerald-600">Allowed Through</p>
           <p className="mt-2 text-3xl font-bold text-emerald-900">{allowedCount}</p>
         </div>
-        <div className="rounded-3xl bg-red-50 border border-red-200 p-4">
+        <div className="rounded-3xl bg-red-500/10 p-4 shadow-sm">
           <p className="text-xs uppercase tracking-[0.28em] text-red-600">Blocked</p>
           <p className="mt-2 text-3xl font-bold text-red-900">{blockedCount}</p>
         </div>
@@ -78,8 +78,8 @@ export default function ConstraintOverrideLog() {
                   ? 'bg-emerald-100 text-emerald-900'
                   : status === 'BLOCKED'
                     ? 'bg-red-100 text-red-900'
-                    : 'bg-slate-900 text-white'
-                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                    : 'bg-surface-elevated text-text-primary'
+                : 'bg-surface-tertiary text-text-secondary hover:bg-surface-elevated'
             }`}
           >
             {status}
@@ -92,12 +92,12 @@ export default function ConstraintOverrideLog() {
         {filtered.map((constraint) => (
           <div
             key={constraint.id}
-            className="rounded-3xl border border-slate-200/70 bg-white/85 p-5 hover:shadow-md transition"
+            className="premium-card rounded-3xl p-5 hover:shadow-md transition"
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex-1 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                  <span className="rounded-full bg-surface-elevated px-3 py-1 text-xs font-semibold text-text-secondary">
                     {constraint.constraint}
                   </span>
                   <span
@@ -108,17 +108,17 @@ export default function ConstraintOverrideLog() {
                     {constraint.override}
                   </span>
                 </div>
-                <p className="text-sm font-semibold text-slate-900">
-                  Decision: <span className="text-slate-600">{constraint.proposedDecision}</span>
+                <p className="text-sm font-semibold text-text-primary">
+                  Decision: <span className="text-text-secondary">{constraint.proposedDecision}</span>
                 </p>
-                <p className="text-sm text-slate-600">{constraint.reason}</p>
-                <div className="flex items-center gap-2 text-xs text-slate-500 pt-1">
+                <p className="text-sm text-text-secondary">{constraint.reason}</p>
+                <div className="flex items-center gap-2 text-xs text-text-tertiary pt-1">
                   <span>{new Date(constraint.timestamp).toLocaleString()}</span>
                   <span>•</span>
                   <span className="font-mono">{constraint.policyVersion}</span>
                 </div>
               </div>
-              <div className="flex-shrink-0 rounded-2xl bg-slate-50 px-3 py-1 text-xs font-mono text-slate-600">
+              <div className="flex-shrink-0 rounded-2xl bg-surface-elevated px-3 py-1 text-xs font-mono text-text-secondary">
                 {constraint.id}
               </div>
             </div>
@@ -127,8 +127,8 @@ export default function ConstraintOverrideLog() {
       </div>
 
       {filtered.length === 0 && (
-        <div className="rounded-3xl border border-slate-200/70 bg-slate-50/75 p-8 text-center">
-          <p className="text-slate-600">No constraints found for this filter.</p>
+        <div className="premium-card rounded-3xl p-8 text-center">
+          <p className="text-text-secondary">No constraints found for this filter.</p>
         </div>
       )}
     </div>

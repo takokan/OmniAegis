@@ -5,23 +5,32 @@
 /* ====== DESIGN TOKENS: OmniAegis Unified Design System ====== */
 
 :root {
-  /* ====== BASE SURFACES (Dark-mode primary) ====== */
-  --color-bg-primary: #0D0E12;
-  --color-bg-secondary: #13151C;
-  --color-bg-tertiary: #1A1D27;
-  --color-bg-elevated: #21253A;
+  /* ====== BASE SURFACES (Light-mode primary) ====== */
+  --color-bg-primary: #F5F6FA;
+  --color-bg-secondary: #FFFFFF;
+  --color-bg-tertiary: #ECEEF5;
+  --color-bg-elevated: #FFFFFF;
+  --color-bg-primary-rgb: 245 246 250;
+  --color-bg-secondary-rgb: 255 255 255;
+  --color-bg-tertiary-rgb: 236 238 245;
+  --color-bg-elevated-rgb: 255 255 255;
 
   /* ====== BORDERS ====== */
-  --color-border-default: rgba(255, 255, 255, 0.06);
-  --color-border-strong: rgba(255, 255, 255, 0.09);
-  --color-border-subtle: rgba(255, 255, 255, 0.03);
-  --color-border-standard: rgba(255, 255, 255, 0.05);
+  --color-border-default: #DDE0ED;
+  --color-border-strong: #B8BCCC;
+  --color-border-subtle: rgba(0, 0, 0, 0.05);
+  --color-border-standard: rgba(0, 0, 0, 0.08);
+  --color-border-default-rgb: 221 224 237;
+  --color-border-strong-rgb: 184 188 204;
+  --color-border-subtle-rgb: 0 0 0;
+  --color-border-standard-rgb: 0 0 0;
 
   /* ====== BRAND ACCENT — Electric Indigo ====== */
   --color-accent: #6C63FF;
   --color-accent-hover: #7B74FF;
   --color-accent-muted: #6C63FF22;
   --color-accent-glow: #6C63FF44;
+  --color-accent-rgb: 108 99 255;
 
   /* ====== SEMANTIC STATUS ====== */
   --color-success: #22D3A0;
@@ -34,11 +43,15 @@
   --color-neutral-bg: #8B93B015;
 
   /* ====== TEXT ====== */
-  --color-text-primary: #E8EAF6;
-  --color-text-secondary: #8B93B0;
-  --color-text-tertiary: #62666D;
-  --color-text-disabled: #4A5070;
+  --color-text-primary: #12152A;
+  --color-text-secondary: #5A6080;
+  --color-text-tertiary: #8A8F98;
+  --color-text-disabled: #A0A8C0;
   --color-text-inverse: #0D0E12;
+  --color-text-primary-rgb: 18 21 42;
+  --color-text-secondary-rgb: 90 96 128;
+  --color-text-tertiary-rgb: 138 143 152;
+  --color-text-disabled-rgb: 160 168 192;
 
   /* ====== HEATMAP OVERLAY (XAI-specific) ====== */
   --color-heatmap-high: rgba(255, 77, 106, 0.75);
@@ -78,10 +91,36 @@
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  color-scheme: dark;
+  color-scheme: light;
   font-family: var(--font-sans);
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
+}
+
+:root[data-theme="dark"],
+.dark {
+  --color-bg-primary: #0D0E12;
+  --color-bg-secondary: #13151C;
+  --color-bg-tertiary: #1A1D27;
+  --color-bg-elevated: #21253A;
+  --color-bg-primary-rgb: 13 14 18;
+  --color-bg-secondary-rgb: 19 21 28;
+  --color-bg-tertiary-rgb: 26 29 39;
+  --color-bg-elevated-rgb: 33 37 58;
+  --color-text-primary: #E8EAF6;
+  --color-text-secondary: #8B93B0;
+  --color-text-primary-rgb: 232 234 246;
+  --color-text-secondary-rgb: 139 147 176;
+  --color-text-tertiary-rgb: 98 102 109;
+  --color-text-disabled-rgb: 74 80 112;
+  --color-border-default: #2A2E45;
+  --color-border-strong: #3D4260;
+  --color-border-default-rgb: 42 46 69;
+  --color-border-strong-rgb: 61 66 96;
+  --color-border-subtle-rgb: 255 255 255;
+  --color-border-standard-rgb: 255 255 255;
+  --color-accent: #6C63FF;
+  --color-accent-rgb: 108 99 255;
 }
 
 /* ====== LIGHT THEME ====== */
@@ -90,14 +129,27 @@
   --color-bg-secondary: #FFFFFF;
   --color-bg-tertiary: #ECEEF5;
   --color-bg-elevated: #FFFFFF;
+  --color-bg-primary-rgb: 245 246 250;
+  --color-bg-secondary-rgb: 255 255 255;
+  --color-bg-tertiary-rgb: 236 238 245;
+  --color-bg-elevated-rgb: 255 255 255;
   --color-border-default: #DDE0ED;
   --color-border-strong: #B8BCCC;
   --color-border-subtle: rgba(0, 0, 0, 0.05);
   --color-border-standard: rgba(0, 0, 0, 0.08);
+  --color-border-default-rgb: 221 224 237;
+  --color-border-strong-rgb: 184 188 204;
+  --color-border-subtle-rgb: 0 0 0;
+  --color-border-standard-rgb: 0 0 0;
   --color-text-primary: #12152A;
   --color-text-secondary: #5A6080;
   --color-text-tertiary: #8A8F98;
   --color-text-disabled: #A0A8C0;
+  --color-text-primary-rgb: 18 21 42;
+  --color-text-secondary-rgb: 90 96 128;
+  --color-text-tertiary-rgb: 138 143 152;
+  --color-text-disabled-rgb: 160 168 192;
+  --color-accent-rgb: 108 99 255;
 }
 
 /* ====== HIGH-CONTRAST MODE ====== */
@@ -192,4 +244,14 @@ html {
 
 .prose {
   color: var(--color-text-primary);
+}
+
+.premium-card {
+  background: var(--color-bg-tertiary);
+  box-shadow: 0 1px 6px rgba(16, 24, 40, 0.08);
+}
+
+.premium-panel {
+  background: var(--color-bg-elevated);
+  box-shadow: 0 12px 36px rgba(16, 24, 40, 0.16);
 }

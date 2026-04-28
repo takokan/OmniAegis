@@ -10,6 +10,43 @@ import {
   Toast,
 } from '@/components/ui';
 
+function AssetTypeIcon({ type }: { type: HITLTask['assetType'] }) {
+  if (type === 'image') {
+    return (
+      <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="2.5" y="3" width="11" height="10" rx="2" />
+        <circle cx="6" cy="6.2" r="1" />
+        <path d="m4 11 2.5-2.5L8.6 10l1.4-1.4L12 11" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  if (type === 'video') {
+    return (
+      <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="2.5" y="3.5" width="7.5" height="9" rx="1.5" />
+        <path d="m10 6 3.5-2v8L10 10" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  if (type === 'audio') {
+    return (
+      <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M6.5 5.5v5a1.75 1.75 0 1 1-1-1.58V4.7l6-1.2v4.8a1.75 1.75 0 1 1-1-1.58V2.7l-4 1" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M4 2.5h5l3 3v8H4z" />
+      <path d="M9 2.5v3h3" />
+      <path d="M6 8.5h4M6 10.5h4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 interface HITLTask {
   id: string;
   assetId: string;
@@ -323,8 +360,8 @@ export default function HITLBoardPage() {
     tasks: HITLTask[];
     accentColor: string;
   }) => (
-    <div className="flex flex-col bg-surface-secondary rounded-lg border border-border-default overflow-hidden">
-      <div className="px-4 py-3 border-b border-border-subtle bg-surface-tertiary">
+    <div className="flex flex-col rounded-xl bg-surface-secondary shadow-[0_10px_28px_rgba(16,24,40,0.08)] overflow-hidden">
+      <div className="px-4 py-3 bg-surface-tertiary/90">
         <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
           <span className={`w-2 h-2 rounded-full ${accentColor}`} />
           {title}
@@ -348,10 +385,10 @@ export default function HITLBoardPage() {
                   setSelectedTask(task);
                   setSelectedColumn(status);
                 }}
-                className={`p-3 rounded-md cursor-pointer transition-colors duration-fast border ${
+                className={`p-3 rounded-lg cursor-pointer transition-all duration-fast shadow-sm ${
                   selectedTask?.id === task.id
-                    ? 'bg-surface-elevated border-accent shadow-glow'
-                    : 'bg-surface-tertiary border-border-default hover:bg-surface-elevated'
+                    ? 'bg-surface-elevated shadow-[0_0_0_1px_rgba(108,99,255,0.28),0_10px_24px_rgba(108,99,255,0.12)]'
+                    : 'bg-surface-tertiary hover:bg-surface-elevated hover:shadow-md'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
@@ -372,7 +409,8 @@ export default function HITLBoardPage() {
                 <p className="text-xs text-text-secondary mb-2">{task.description}</p>
 
                 <div className="flex items-center justify-between gap-2 mb-2">
-                  <span className="px-2 py-1 rounded text-xs font-semibold bg-surface-secondary text-text-secondary">
+                  <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-semibold bg-surface-secondary text-text-secondary shadow-sm">
+                    <AssetTypeIcon type={task.assetType} />
                     {task.assetType.toUpperCase()}
                   </span>
                   <ConfidenceBadge value={task.confidence} size="sm" />
@@ -546,13 +584,13 @@ export default function HITLBoardPage() {
 
           {/* Quick Stats */}
           <div className="flex gap-4">
-            <div className="px-4 py-2 rounded-md bg-danger bg-opacity-10 border border-danger border-opacity-30">
+            <div className="px-4 py-2 rounded-lg bg-danger bg-opacity-10 shadow-sm">
               <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold">
                 Pending
               </p>
               <p className="text-2xl font-bold text-danger mt-1">{totalPending}</p>
             </div>
-            <div className="px-4 py-2 rounded-md bg-warning bg-opacity-10 border border-warning border-opacity-30">
+            <div className="px-4 py-2 rounded-lg bg-warning bg-opacity-10 shadow-sm">
               <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold">
                 Reviewing
               </p>

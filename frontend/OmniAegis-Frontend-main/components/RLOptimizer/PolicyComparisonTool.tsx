@@ -35,7 +35,7 @@ export default function PolicyComparisonTool() {
 
   if (!data) {
     return (
-      <div className="h-80 rounded-[1.75rem] border border-slate-200/80 bg-slate-50/80 flex items-center justify-center text-slate-500">
+      <div className="h-80 rounded-[1.75rem] bg-surface-elevated flex items-center justify-center text-text-secondary shadow-sm">
         <p className="text-sm">Loading policy metrics...</p>
       </div>
     );
@@ -67,9 +67,9 @@ export default function PolicyComparisonTool() {
             className={`flex-1 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
               activePolicy === policy
                 ? policy === 'shadow'
-                  ? 'bg-slate-100 text-slate-900'
-                  : 'bg-accent text-white'
-                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                  ? 'bg-surface-elevated text-text-primary'
+                  : 'bg-accent text-text-primary'
+                : 'bg-surface-tertiary text-text-secondary hover:bg-surface-elevated'
             }`}
           >
             {policy === 'shadow' ? '🔬 Shadow' : '🚀 Live'}
@@ -78,14 +78,14 @@ export default function PolicyComparisonTool() {
       </div>
 
       {/* Active Policy Info */}
-      <div className="rounded-3xl bg-slate-50/75 p-6 space-y-2">
+      <div className="rounded-3xl bg-surface-elevated p-6 space-y-2 shadow-sm">
         <div className="flex items-center justify-between">
-          <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Policy Version</p>
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-mono font-semibold text-slate-700">
+          <p className="text-xs uppercase tracking-[0.28em] text-text-tertiary">Policy Version</p>
+          <span className="rounded-full bg-surface-primary px-3 py-1 text-xs font-mono font-semibold text-text-secondary">
             {metrics.version}
           </span>
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-text-tertiary">
           Deployed: {new Date(metrics.deployedAt).toLocaleString()}
         </p>
       </div>
@@ -93,13 +93,13 @@ export default function PolicyComparisonTool() {
       {/* Metrics Grid */}
       <div className="grid gap-4 sm:grid-cols-2">
         {comparison.slice(0, 4).map((metric) => (
-          <div key={metric.label} className="rounded-3xl border border-slate-200/70 bg-white/85 p-4">
-            <p className="text-xs uppercase tracking-[0.28em] text-slate-400">{metric.label}</p>
-            <p className="mt-2 text-2xl font-bold text-slate-950">
+          <div key={metric.label} className="premium-card rounded-3xl p-4">
+            <p className="text-xs uppercase tracking-[0.28em] text-text-tertiary">{metric.label}</p>
+            <p className="mt-2 text-2xl font-bold text-text-primary">
               {formatVal(metric.shadowVal)}{metric.unit}
             </p>
             <div className="mt-2 flex items-center justify-between text-xs">
-              <span className="text-slate-500">vs Live:</span>
+              <span className="text-text-tertiary">vs Live:</span>
               <span className={getImprovementBadge(metric)}>
                 {formatVal(metric.liveVal)}{metric.unit}
               </span>
@@ -109,15 +109,15 @@ export default function PolicyComparisonTool() {
       </div>
 
       {/* Constraints Status */}
-      <div className="rounded-3xl border border-slate-200/70 bg-white/85 p-6 space-y-4">
-        <p className="text-sm font-semibold text-slate-900">Constraint Status</p>
+      <div className="premium-card rounded-3xl p-6 space-y-4">
+        <p className="text-sm font-semibold text-text-primary">Constraint Status</p>
         <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl bg-slate-50 p-4">
-            <p className="text-xs text-slate-500">Privacy Budget</p>
-            <p className="mt-1 font-mono font-semibold text-slate-900">
+          <div className="rounded-2xl bg-surface-elevated p-4">
+            <p className="text-xs text-text-tertiary">Privacy Budget</p>
+            <p className="mt-1 font-mono font-semibold text-text-primary">
               {metrics.constraints.privacyBudget.used}/{metrics.constraints.privacyBudget.total}
             </p>
-            <div className="mt-2 h-1 rounded-full bg-slate-200 overflow-hidden">
+            <div className="mt-2 h-1 rounded-full bg-surface-primary overflow-hidden">
               <div
                 className={`h-full ${
                   metrics.constraints.privacyBudget.used / metrics.constraints.privacyBudget.total > 0.8
@@ -130,16 +130,16 @@ export default function PolicyComparisonTool() {
               />
             </div>
           </div>
-          <div className="rounded-2xl bg-slate-50 p-4">
-            <p className="text-xs text-slate-500">Fairness Score</p>
-            <p className="mt-1 font-mono font-semibold text-slate-900">
+          <div className="rounded-2xl bg-surface-elevated p-4">
+            <p className="text-xs text-text-tertiary">Fairness Score</p>
+            <p className="mt-1 font-mono font-semibold text-text-primary">
               {(metrics.constraints.fairnessThreshold * 100).toFixed(1)}%
             </p>
             <p className="mt-2 text-xs text-emerald-600 font-semibold">Threshold met ✓</p>
           </div>
-          <div className="rounded-2xl bg-slate-50 p-4">
-            <p className="text-xs text-slate-500">Latency P99</p>
-            <p className="mt-1 font-mono font-semibold text-slate-900">{metrics.constraints.latencyP99}ms</p>
+          <div className="rounded-2xl bg-surface-elevated p-4">
+            <p className="text-xs text-text-tertiary">Latency P99</p>
+            <p className="mt-1 font-mono font-semibold text-text-primary">{metrics.constraints.latencyP99}ms</p>
             <p className="mt-2 text-xs text-emerald-600 font-semibold">Within SLA ✓</p>
           </div>
         </div>

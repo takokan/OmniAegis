@@ -17,10 +17,10 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-surface-primary flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-accent border-r-transparent" />
-          <p className="text-slate-600">Loading...</p>
+          <p className="text-text-secondary">Loading...</p>
         </div>
       </div>
     );
@@ -28,10 +28,10 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-surface-primary flex items-center justify-center">
         <div className="text-center space-y-3">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-accent border-r-transparent" />
-          <p className="text-slate-600">Redirecting to login...</p>
+          <p className="text-text-secondary">Redirecting to login...</p>
         </div>
       </div>
     );

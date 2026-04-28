@@ -21,10 +21,10 @@ export default function RoleBasedNavigation() {
   const visibleItems = navItems.filter((item) => item.roles.includes(user.role));
 
   return (
-    <aside className="space-y-4 rounded-3xl border border-slate-200/70 bg-slate-50/80 p-6 shadow-sm">
+    <aside className="premium-card space-y-4 rounded-3xl p-6">
       <div className="space-y-1">
-        <p className="text-xs uppercase tracking-[0.32em] text-slate-400">Navigation</p>
-        <p className="text-sm font-semibold text-slate-600 mt-2 mb-4">
+        <p className="text-xs uppercase tracking-[0.32em] text-text-tertiary">Navigation</p>
+        <p className="text-sm font-semibold text-text-secondary mt-2 mb-4">
           {user.role === 'admin' ? '👨‍💼 Admin' : '👁️ Reviewer'}
         </p>
       </div>
@@ -37,8 +37,8 @@ export default function RoleBasedNavigation() {
               href={item.href}
               className={`block rounded-2xl px-4 py-3 text-sm font-semibold transition ${
                 isActive
-                  ? 'bg-slate-950/5 text-slate-900'
-                  : 'text-slate-600 hover:bg-slate-950/5 hover:text-slate-900'
+                  ? 'bg-surface-elevated text-text-primary'
+                  : 'text-text-secondary hover:bg-surface-elevated hover:text-text-primary'
               }`}
             >
               {item.label}
@@ -48,15 +48,15 @@ export default function RoleBasedNavigation() {
       </div>
 
       {/* User Info & Logout */}
-      <div className="border-t border-slate-200 pt-4 mt-6 space-y-3">
+      <div className="pt-4 mt-6 space-y-3">
         <div className="text-sm">
-          <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Logged in as</p>
-          <p className="font-semibold text-slate-900 mt-1">{user.name}</p>
-          <p className="text-xs text-slate-500">{user.email}</p>
+          <p className="text-xs uppercase tracking-[0.28em] text-text-tertiary">Logged in as</p>
+          <p className="font-semibold text-text-primary mt-1">{user.name}</p>
+          <p className="text-xs text-text-secondary">{user.email}</p>
         </div>
         <button
           onClick={logout}
-          className="w-full rounded-2xl bg-slate-200 hover:bg-slate-300 text-slate-900 font-semibold py-2 text-sm transition"
+          className="w-full rounded-2xl bg-surface-elevated hover:bg-accent/10 text-text-primary font-semibold py-2 text-sm transition"
         >
           Sign out
         </button>

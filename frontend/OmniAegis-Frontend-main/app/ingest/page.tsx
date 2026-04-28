@@ -308,28 +308,28 @@ export default function IngestExplorerPage() {
 
         {/* Statistics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 rounded-lg border border-border-default bg-surface-secondary">
+          <div className="p-4 rounded-lg bg-surface-secondary shadow-sm">
             <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold mb-2">
               Total Ingested
             </p>
             <p className="text-3xl font-bold text-text-primary">{stats.total}</p>
           </div>
 
-          <div className="p-4 rounded-lg border border-border-default bg-surface-secondary">
+          <div className="p-4 rounded-lg bg-surface-secondary shadow-sm">
             <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold mb-2">
               Completed
             </p>
             <p className="text-3xl font-bold text-success">{stats.completed}</p>
           </div>
 
-          <div className="p-4 rounded-lg border border-border-default bg-surface-secondary">
+          <div className="p-4 rounded-lg bg-surface-secondary shadow-sm">
             <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold mb-2">
               Processing
             </p>
             <p className="text-3xl font-bold text-warning">{stats.processing}</p>
           </div>
 
-          <div className="p-4 rounded-lg border border-border-default bg-surface-secondary">
+          <div className="p-4 rounded-lg bg-surface-secondary shadow-sm">
             <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold mb-2">
               Failed
             </p>
@@ -338,7 +338,7 @@ export default function IngestExplorerPage() {
         </div>
 
         {(loading || error) && (
-          <div className="rounded-xl border border-border-default bg-surface-secondary px-4 py-3">
+          <div className="rounded-xl bg-surface-secondary px-4 py-3 shadow-sm">
             <p className="text-xs uppercase tracking-[0.18em] text-text-tertiary">Data source</p>
             <p className="mt-2 text-sm text-text-primary">
               {loading
@@ -350,7 +350,7 @@ export default function IngestExplorerPage() {
         )}
 
         {/* Filters */}
-        <div className="p-4 bg-surface-secondary rounded-lg border border-border-default space-y-4">
+        <div className="p-4 bg-surface-secondary rounded-lg space-y-4 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
             <Input
               label="Search Items"
@@ -501,7 +501,7 @@ export default function IngestExplorerPage() {
               <div
                 key={item.id}
                 onClick={() => setSelectedItem(item)}
-                className="p-4 rounded-lg border border-border-default bg-surface-secondary hover:bg-surface-tertiary cursor-pointer transition-colors duration-fast"
+                className="p-4 rounded-lg bg-surface-secondary hover:bg-surface-tertiary cursor-pointer transition-colors duration-fast shadow-sm"
               >
                 <div className="flex items-start justify-between mb-3">
                   <code className="text-xs font-mono text-accent">{item.id}</code>

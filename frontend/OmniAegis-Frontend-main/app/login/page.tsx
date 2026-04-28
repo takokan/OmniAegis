@@ -70,7 +70,7 @@ export default function LoginPage() {
             </div>
 
             {/* Auth Card */}
-            <div className="rounded-[2rem] border border-border-default bg-surface-secondary shadow-md p-8 space-y-6">
+            <div className="rounded-[2rem] bg-surface-secondary shadow-md p-8 space-y-6">
               <div className="grid grid-cols-2 rounded-2xl bg-surface-tertiary p-1">
                 <button
                   type="button"
@@ -160,7 +160,7 @@ export default function LoginPage() {
                 <input
                   type="submit"
                   disabled={isLoading}
-                  className="w-full rounded-2xl bg-accent hover:bg-accent/90 disabled:bg-surface-tertiary text-white font-semibold py-3 transition shadow-lg shadow-accent/20 cursor-pointer"
+                  className="w-full rounded-2xl bg-accent hover:bg-accent/90 disabled:bg-surface-tertiary text-text-primary font-semibold py-3 transition shadow-lg shadow-accent/20 cursor-pointer"
                   value={isLoading ? 'Processing...' : mode === 'login' ? 'Sign in' : 'Create account'}
                 />
 

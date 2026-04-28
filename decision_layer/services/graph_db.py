@@ -62,21 +62,31 @@ class GraphDBService:
                 SET a.modality = $modality,
                     a.source = $source,
                     a.filename = $filename,
+                    a.title = $title,
+                    a.user_id = $user_id,
                     a.is_flagged = $is_flagged,
                     a.authorization_status = $authorization_status,
                     a.decision_label = $decision_label,
                     a.decision_confidence = $decision_confidence,
-                    a.source_tier = $source_tier
+                    a.source_tier = $source_tier,
+                    a.license_file_name = $license_file_name,
+                    a.license_content_type = $license_content_type,
+                    a.uploaded_at = $uploaded_at
                 """,
                 asset_id=asset_id,
                 modality=metadata.get("modality"),
                 source=metadata.get("source"),
                 filename=metadata.get("filename"),
+                title=metadata.get("title"),
+                user_id=metadata.get("user_id"),
                 is_flagged=bool(metadata.get("is_flagged", False)),
                 authorization_status=metadata.get("authorization_status"),
                 decision_label=metadata.get("decision_label"),
                 decision_confidence=float(metadata.get("decision_confidence", 0.0)),
                 source_tier=metadata.get("source_tier"),
+                license_file_name=metadata.get("license_file_name"),
+                license_content_type=metadata.get("license_content_type"),
+                uploaded_at=metadata.get("uploaded_at"),
             )
 
             creator_id = metadata.get("creator_id")
@@ -187,4 +197,130 @@ class GraphDBService:
         return {
             "query_asset_id": row["query_asset_id"],
             "neighbors": [n for n in (row["neighbors"] or []) if n.get("asset_id")],
+        }
+
+    def fetch_asset_relationship_graph(self, asset_id: str, limit_assets: int = 24) -> dict[str, Any]:
+        with self.driver.session(database=self.database) as session:
+            records = session.run(
+                """
+                MATCH (q:Asset {asset_id: $asset_id})
+                OPTIONAL MATCH (q)-[r1:SIMILAR_TO|FLAGGED_WITH]->(neighbor:Asset)
+                OPTIONAL MATCH (q)-[r2:CREATED_BY]->(creator:Creator)
+                OPTIONAL MATCH (q)-[r3:LICENSED_TO]->(licensee:Licensee)
+                WITH q,
+                     collect(DISTINCT {
+                         node: neighbor,
+                         rel_type: type(r1),
+                         rel_weight: coalesce(r1.weight, 0.0)
+                     })[..$limit_assets] AS asset_links,
+                     collect(DISTINCT {
+                         node: creator,
+                         rel_type: type(r2),
+                         rel_weight: coalesce(r2.weight, 1.0)
+                     }) AS creator_links,
+                     collect(DISTINCT {
+                         node: licensee,
+                         rel_type: type(r3),
+                         rel_weight: coalesce(r3.weight, 1.0)
+                     }) AS licensee_links
+                RETURN q.asset_id AS query_asset_id,
+                       q {
+                           .asset_id,
+                           .modality,
+                           .source,
+                           .filename,
+                           .title,
+                           .user_id,
+                           .authorization_status,
+                           .decision_label,
+                           .decision_confidence,
+                           .is_flagged,
+                           .source_tier,
+                           .license_file_name,
+                           .license_content_type,
+                           .uploaded_at
+                       } AS query_asset,
+                       asset_links,
+                       creator_links,
+                       licensee_links
+                """,
+                asset_id=asset_id,
+                limit_assets=limit_assets,
+            )
+            row = records.single()
+
+        if row is None:
+            return {"query_asset_id": asset_id, "nodes": [], "edges": []}
+
+        query_asset = dict(row["query_asset"] or {})
+        query_asset_id = str(query_asset.get("asset_id") or asset_id)
+
+        nodes: list[dict[str, Any]] = [
+            {
+                "id": query_asset_id,
+                "label": query_asset.get("filename") or query_asset_id,
+                "type": "asset",
+                "is_query": True,
+                "metadata": query_asset,
+            }
+        ]
+        edges: list[dict[str, Any]] = []
+        seen_nodes = {query_asset_id}
+        seen_edges: set[tuple[str, str, str]] = set()
+
+        def add_link(raw_links: list[dict[str, Any]] | None, node_type: str) -> None:
+            for raw in raw_links or []:
+                node = raw.get("node")
+                if node is None:
+                    continue
+
+                payload = dict(node)
+                if node_type == "asset":
+                    node_id = str(payload.get("asset_id", "")).strip()
+                    label = payload.get("filename") or node_id
+                elif node_type == "creator":
+                    node_id = str(payload.get("creator_id", "")).strip()
+                    label = node_id
+                else:
+                    node_id = str(payload.get("licensee_id", "")).strip()
+                    label = node_id
+
+                if not node_id:
+                    continue
+
+                if node_id not in seen_nodes:
+                    nodes.append(
+                        {
+                            "id": node_id,
+                            "label": label,
+                            "type": node_type,
+                            "is_query": False,
+                            "metadata": payload,
+                        }
+                    )
+                    seen_nodes.add(node_id)
+
+                rel_type = str(raw.get("rel_type", "")).strip()
+                edge_key = (query_asset_id, node_id, rel_type)
+                if not rel_type or edge_key in seen_edges:
+                    continue
+
+                edges.append(
+                    {
+                        "source": query_asset_id,
+                        "target": node_id,
+                        "type": rel_type,
+                        "weight": float(raw.get("rel_weight", 0.0)),
+                    }
+                )
+                seen_edges.add(edge_key)
+
+        add_link(row.get("asset_links"), "asset")
+        add_link(row.get("creator_links"), "creator")
+        add_link(row.get("licensee_links"), "licensee")
+
+        return {
+            "query_asset_id": query_asset_id,
+            "nodes": nodes,
+            "edges": edges,
         }

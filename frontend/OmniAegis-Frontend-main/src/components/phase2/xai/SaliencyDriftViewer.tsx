@@ -47,7 +47,7 @@ const TextHeatmap: React.FC<{ text?: string }> = ({ text }) => {
   if (!text) return null;
   return (
     <div className="absolute inset-0 pointer-events-none flex items-end">
-      <div className="w-full text-xs text-gray-200 p-3 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80">
+      <div className="w-full text-xs text-text-primary p-3 bg-gradient-to-t from-surface-primary/70 via-transparent to-transparent opacity-80">
         <pre className="whitespace-pre-wrap break-words">{text}</pre>
       </div>
     </div>
@@ -61,7 +61,7 @@ const SaliencyDriftViewer: React.FC<SaliencyDriftViewerProps> = ({ points = [], 
     <ErrorBoundary>
       <GlassCard className="relative">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm text-gray-200">Saliency / Drift Viewer</h3>
+          <h3 className="text-sm text-text-primary">Saliency / Drift Viewer</h3>
         </div>
         <div className="relative">
           <CanvasScatter points={points} onSelect={onSelect} />

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout';
+import OverviewRegistrationPrompt from '@/components/OverviewRegistrationPrompt';
 import {
   ConfidenceBadge,
   StatusChip,
@@ -9,6 +10,41 @@ import {
   DataTable,
   Modal,
 } from '@/components/ui';
+
+function OverviewMetricIcon({ type }: { type: 'ingest' | 'decision' | 'queue' | 'privacy' }) {
+  switch (type) {
+    case 'ingest':
+      return (
+        <svg className="h-7 w-7 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path d="M12 4v9" strokeLinecap="round" />
+          <path d="m8.5 9.5 3.5 3.5 3.5-3.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M5 18.5h14" strokeLinecap="round" />
+        </svg>
+      );
+    case 'decision':
+      return (
+        <svg className="h-7 w-7 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path d="m6 12.5 4 4 8-9" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
+    case 'queue':
+      return (
+        <svg className="h-7 w-7 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <circle cx="8" cy="9" r="2.5" />
+          <circle cx="16" cy="9" r="2.5" />
+          <path d="M4.5 18c.7-2.2 2-3.5 3.5-3.5S10.8 15.8 11.5 18" strokeLinecap="round" />
+          <path d="M12.5 18c.7-2.2 2-3.5 3.5-3.5s2.8 1.3 3.5 3.5" strokeLinecap="round" />
+        </svg>
+      );
+    case 'privacy':
+      return (
+        <svg className="h-7 w-7 text-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <rect x="5" y="11" width="14" height="9" rx="2" />
+          <path d="M8 11V8a4 4 0 1 1 8 0v3" strokeLinecap="round" />
+        </svg>
+      );
+  }
+}
 
 interface AuditRow {
   id: string;
@@ -113,17 +149,19 @@ export default function OverviewPage() {
           </p>
         </div>
 
+        <OverviewRegistrationPrompt />
+
         {/* KPI Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'Ingested Today', value: '14,302', icon: '📥' },
-            { label: 'Decisions Made', value: '9,847', icon: '✓' },
-            { label: 'HITL Queue', value: '12', icon: '👥' },
-            { label: 'Privacy Budget', value: 'ε: 0.73', icon: '🔒' },
+            { label: 'Ingested Today', value: '14,302', icon: 'ingest' as const },
+            { label: 'Decisions Made', value: '9,847', icon: 'decision' as const },
+            { label: 'HITL Queue', value: '12', icon: 'queue' as const },
+            { label: 'Privacy Budget', value: 'ε: 0.73', icon: 'privacy' as const },
           ].map((metric) => (
             <div
               key={metric.label}
-              className="p-6 rounded-lg border border-border-default bg-surface-secondary hover:bg-surface-tertiary transition-colors duration-fast"
+              className="p-6 rounded-xl bg-surface-secondary hover:bg-surface-tertiary transition-colors duration-fast shadow-[0_12px_28px_rgba(16,24,40,0.08)]"
             >
               <div className="flex items-start justify-between">
                 <div>
@@ -132,7 +170,9 @@ export default function OverviewPage() {
                   </p>
                   <p className="text-3xl font-bold text-text-primary mt-2">{metric.value}</p>
                 </div>
-                <span className="text-3xl">{metric.icon}</span>
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-surface-elevated shadow-sm">
+                  <OverviewMetricIcon type={metric.icon} />
+                </div>
               </div>
             </div>
           ))}
@@ -145,7 +185,7 @@ export default function OverviewPage() {
           <div className="space-y-3">
             <div>
               <h3 className="text-sm font-medium text-text-secondary mb-3">Confidence Badges</h3>
-              <div className="flex items-center gap-6 p-4 bg-surface-secondary rounded-lg border border-border-default">
+              <div className="flex items-center gap-6 p-4 bg-surface-secondary rounded-lg shadow-sm">
                 <div>
                   <p className="text-xs text-text-secondary mb-2">High (≥0.80)</p>
                   <ConfidenceBadge value={0.87} />
@@ -163,7 +203,7 @@ export default function OverviewPage() {
 
             <div>
               <h3 className="text-sm font-medium text-text-secondary mb-3">Status Chips</h3>
-              <div className="flex flex-wrap items-center gap-3 p-4 bg-surface-secondary rounded-lg border border-border-default">
+              <div className="flex flex-wrap items-center gap-3 p-4 bg-surface-secondary rounded-lg shadow-sm">
                 <StatusChip status="approved" />
                 <StatusChip status="rejected" />
                 <StatusChip status="pending" />
@@ -175,7 +215,7 @@ export default function OverviewPage() {
 
             <div>
               <h3 className="text-sm font-medium text-text-secondary mb-3">Buttons</h3>
-              <div className="flex flex-wrap items-center gap-3 p-4 bg-surface-secondary rounded-lg border border-border-default">
+              <div className="flex flex-wrap items-center gap-3 p-4 bg-surface-secondary rounded-lg shadow-sm">
                 <Button variant="primary" size="md">
                   Primary
                 </Button>
@@ -278,7 +318,7 @@ export default function OverviewPage() {
           <p className="text-sm text-text-secondary">
             This is a modal dialog showing the details of the selected audit record.
           </p>
-          <div className="p-4 bg-surface-tertiary rounded-lg border border-border-default">
+          <div className="p-4 bg-surface-tertiary rounded-lg shadow-sm">
             <p className="text-xs text-text-secondary uppercase letter-spacing-wide font-semibold mb-2">
               Audit Information
             </p>

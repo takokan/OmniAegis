@@ -12,10 +12,10 @@ const GlassCard: React.FC<PropsWithChildren<GlassCardProps>> = ({ children, clas
   return (
     <div
       role={role || 'region'}
-      className={join('rounded-lg p-4', 'backdrop-blur-md', 'border', 'shadow-sm', 'overflow-hidden', className)}
+      className={join('rounded-lg p-4', 'backdrop-blur-md', 'shadow-sm', 'overflow-hidden', className)}
       style={{
         background: theme.colors.surface,
-        borderColor: theme.colors.glassBorder,
+        boxShadow: '0 1px 4px rgba(0,0,0,0.35)',
       }}
     >
       {children}

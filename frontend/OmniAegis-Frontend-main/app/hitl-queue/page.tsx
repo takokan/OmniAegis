@@ -49,19 +49,19 @@ export default function HITLQueuePage() {
     <DashboardShell>
       <div className="space-y-8">
         <div className="space-y-3">
-          <p className="text-sm uppercase tracking-[0.28em] text-slate-400">Human-in-the-Loop</p>
-          <h1 className="text-4xl font-bold tracking-tight text-slate-950">Operational Queue</h1>
-          <p className="text-base leading-8 text-slate-600">
+          <p className="text-sm uppercase tracking-[0.28em] text-text-tertiary">Human-in-the-Loop</p>
+          <h1 className="text-4xl font-bold tracking-tight text-text-primary">Operational Queue</h1>
+          <p className="text-base leading-8 text-text-secondary">
             High-efficiency interface for final enforcement decisions. Review explanations, contextual data, and take action on pending cases.
           </p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[0.6fr_1.4fr]">
           {/* Queue List */}
-          <section className="rounded-[2rem] border border-slate-200/70 bg-white/90 p-8 shadow-sm backdrop-blur-sm">
+          <section className="premium-card rounded-[2rem] p-8 backdrop-blur-sm">
             <div className="mb-6">
-              <p className="text-sm uppercase tracking-[0.28em] text-slate-400">Queue</p>
-              <h2 className="mt-2 text-2xl font-bold text-slate-950">Pending Decisions</h2>
+              <p className="text-sm uppercase tracking-[0.28em] text-text-tertiary">Queue</p>
+              <h2 className="mt-2 text-2xl font-bold text-text-primary">Pending Decisions</h2>
             </div>
             <HITLQueueList
               onSelect={(item) => {
@@ -77,19 +77,19 @@ export default function HITLQueuePage() {
               {!decisionMade ? (
                 <>
                   {/* Explanation Package */}
-                  <section className="rounded-[2rem] border border-slate-200/70 bg-white/90 p-8 shadow-sm backdrop-blur-sm">
+                  <section className="premium-card rounded-[2rem] p-8 backdrop-blur-sm">
                     <div className="mb-6">
-                      <p className="text-sm uppercase tracking-[0.28em] text-slate-400">Explainability</p>
-                      <h2 className="mt-2 text-2xl font-bold text-slate-950">Explanation Package</h2>
+                      <p className="text-sm uppercase tracking-[0.28em] text-text-tertiary">Explainability</p>
+                      <h2 className="mt-2 text-2xl font-bold text-text-primary">Explanation Package</h2>
                     </div>
                     <ExplanationPackage item={selectedItem} />
                   </section>
 
                   {/* Decision Workflow */}
-                  <section className="rounded-[2rem] border border-slate-200/70 bg-white/90 p-8 shadow-sm backdrop-blur-sm">
+                  <section className="premium-card rounded-[2rem] p-8 backdrop-blur-sm">
                     <div className="mb-6">
-                      <p className="text-sm uppercase tracking-[0.28em] text-slate-400">Decision</p>
-                      <h2 className="mt-2 text-2xl font-bold text-slate-950">Take Action</h2>
+                      <p className="text-sm uppercase tracking-[0.28em] text-text-tertiary">Decision</p>
+                      <h2 className="mt-2 text-2xl font-bold text-text-primary">Take Action</h2>
                     </div>
                     <DecisionWorkflow
                       itemId={selectedItem.id}
@@ -98,13 +98,13 @@ export default function HITLQueuePage() {
                   </section>
                 </>
               ) : (
-                <div className="rounded-[2rem] border border-emerald-200 bg-emerald-50 p-8 shadow-sm backdrop-blur-sm flex flex-col items-center justify-center min-h-96 text-center">
+                <div className="rounded-[2rem] bg-emerald-500/10 p-8 shadow-sm backdrop-blur-sm flex flex-col items-center justify-center min-h-96 text-center">
                   <div className="text-5xl mb-4">✓</div>
                   <h3 className="text-2xl font-bold text-emerald-900 mb-2">Decision Recorded</h3>
                   <p className="text-emerald-700 mb-6">Your action has been logged and will influence future model training.</p>
                   <button
                     onClick={() => setSelectedItem(null)}
-                    className="rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 transition"
+                    className="rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-text-primary font-semibold px-6 py-3 transition"
                   >
                     Next Item in Queue
                   </button>
@@ -112,10 +112,10 @@ export default function HITLQueuePage() {
               )}
             </div>
           ) : (
-            <section className="rounded-[2rem] border border-slate-200/70 bg-slate-50/75 p-8 flex items-center justify-center min-h-96 text-center">
+            <section className="premium-card rounded-[2rem] p-8 flex items-center justify-center min-h-96 text-center">
               <div>
-                <p className="text-slate-600 font-semibold">Select a case from the queue to begin review</p>
-                <p className="text-sm text-slate-500 mt-2">Each case includes visual explanations and contextual data</p>
+                <p className="text-text-secondary font-semibold">Select a case from the queue to begin review</p>
+                <p className="text-sm text-text-tertiary mt-2">Each case includes visual explanations and contextual data</p>
               </div>
             </section>
           )}
